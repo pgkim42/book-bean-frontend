@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Mail, Phone, MapPin, Calendar, Star } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Calendar, Star, Edit2, X, Save } from 'lucide-react';
 import toast from 'react-hot-toast';
 import userService from '../services/userService';
 import reviewService from '../services/reviewService';
@@ -23,6 +23,14 @@ const Profile = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [editingReview, setEditingReview] = useState(null);
   const [showReviewForm, setShowReviewForm] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: '',
+    phone: '',
+    zipCode: '',
+    address: '',
+    addressDetail: '',
+  });
   const pageSize = 5;
 
   useEffect(() => {
@@ -35,10 +43,53 @@ const Profile = () => {
     try {
       const response = await userService.getMyInfo();
       setUser(response.data);
+      // 편집 폼 초기화
+      setEditForm({
+        name: response.data.name || '',
+        phone: response.data.phone || '',
+        zipCode: response.data.zipCode || '',
+        address: response.data.address || '',
+        addressDetail: response.data.addressDetail || '',
+      });
     } catch (error) {
       toast.error('프로필 정보를 불러올 수 없습니다');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    // 원래 값으로 복원
+    setEditForm({
+      name: user.name || '',
+      phone: user.phone || '',
+      zipCode: user.zipCode || '',
+      address: user.address || '',
+      addressDetail: user.addressDetail || '',
+    });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSaveProfile = async () => {
+    try {
+      await userService.updateUser(user.id, editForm);
+      toast.success('프로필이 수정되었습니다');
+      setIsEditing(false);
+      fetchProfile(); // 최신 정보 다시 가져오기
+    } catch (error) {
+      toast.error(error.message || '프로필 수정에 실패했습니다');
     }
   };
 
@@ -112,16 +163,62 @@ const Profile = () => {
       <div className="space-y-6">
         {/* 기본 정보 */}
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-bold mb-6">기본 정보</h2>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-bold">기본 정보</h2>
+            {!isEditing ? (
+              <Button
+                onClick={handleEditClick}
+                variant="outline"
+                size="sm"
+                className="flex items-center space-x-1"
+              >
+                <Edit2 className="w-4 h-4" />
+                <span>수정</span>
+              </Button>
+            ) : (
+              <div className="flex space-x-2">
+                <Button
+                  onClick={handleSaveProfile}
+                  size="sm"
+                  className="flex items-center space-x-1"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>저장</span>
+                </Button>
+                <Button
+                  onClick={handleCancelEdit}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center space-x-1"
+                >
+                  <X className="w-4 h-4" />
+                  <span>취소</span>
+                </Button>
+              </div>
+            )}
+          </div>
+
           <div className="space-y-4">
+            {/* 이름 */}
             <div className="flex items-center space-x-3">
               <User className="w-5 h-5 text-gray-400" />
               <div className="flex-1">
                 <p className="text-sm text-gray-600">이름</p>
-                <p className="font-medium">{user.name}</p>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    name="name"
+                    value={editForm.name}
+                    onChange={handleInputChange}
+                    className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  />
+                ) : (
+                  <p className="font-medium">{user.name}</p>
+                )}
               </div>
             </div>
 
+            {/* 이메일 (읽기 전용) */}
             <div className="flex items-center space-x-3">
               <Mail className="w-5 h-5 text-gray-400" />
               <div className="flex-1">
@@ -130,48 +227,98 @@ const Profile = () => {
               </div>
             </div>
 
-            {user.phone && (
+            {/* 전화번호 */}
+            <div className="flex items-center space-x-3">
+              <Phone className="w-5 h-5 text-gray-400" />
+              <div className="flex-1">
+                <p className="text-sm text-gray-600">전화번호</p>
+                {isEditing ? (
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={editForm.phone}
+                    onChange={handleInputChange}
+                    placeholder="010-1234-5678"
+                    className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  />
+                ) : (
+                  <p className="font-medium">{user.phone || '-'}</p>
+                )}
+              </div>
+            </div>
+
+            {/* 가입일 (읽기 전용) */}
+            {!isEditing && (
               <div className="flex items-center space-x-3">
-                <Phone className="w-5 h-5 text-gray-400" />
+                <Calendar className="w-5 h-5 text-gray-400" />
                 <div className="flex-1">
-                  <p className="text-sm text-gray-600">전화번호</p>
-                  <p className="font-medium">{user.phone}</p>
+                  <p className="text-sm text-gray-600">가입일</p>
+                  <p className="font-medium">{formatDate(user.createdAt)}</p>
                 </div>
               </div>
             )}
-
-            <div className="flex items-center space-x-3">
-              <Calendar className="w-5 h-5 text-gray-400" />
-              <div className="flex-1">
-                <p className="text-sm text-gray-600">가입일</p>
-                <p className="font-medium">{formatDate(user.createdAt)}</p>
-              </div>
-            </div>
           </div>
         </div>
 
         {/* 배송지 정보 */}
-        {(user.address || user.zipCode) && (
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-bold mb-6">배송지 정보</h2>
-            <div className="flex items-start space-x-3">
-              <MapPin className="w-5 h-5 text-gray-400 mt-1" />
-              <div className="flex-1">
-                {user.zipCode && (
-                  <p className="text-gray-700">({user.zipCode})</p>
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-bold mb-6">배송지 정보</h2>
+          <div className="flex items-start space-x-3">
+            <MapPin className="w-5 h-5 text-gray-400 mt-1" />
+            <div className="flex-1 space-y-3">
+              {/* 우편번호 */}
+              <div>
+                <p className="text-sm text-gray-600">우편번호</p>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    name="zipCode"
+                    value={editForm.zipCode}
+                    onChange={handleInputChange}
+                    placeholder="12345"
+                    className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  />
+                ) : (
+                  <p className="font-medium">{user.zipCode || '-'}</p>
                 )}
-                {user.address && (
-                  <>
-                    <p className="font-medium">{user.address}</p>
-                    {user.addressDetail && (
-                      <p className="text-gray-700">{user.addressDetail}</p>
-                    )}
-                  </>
+              </div>
+
+              {/* 주소 */}
+              <div>
+                <p className="text-sm text-gray-600">주소</p>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    name="address"
+                    value={editForm.address}
+                    onChange={handleInputChange}
+                    placeholder="서울시 강남구"
+                    className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  />
+                ) : (
+                  <p className="font-medium">{user.address || '-'}</p>
+                )}
+              </div>
+
+              {/* 상세주소 */}
+              <div>
+                <p className="text-sm text-gray-600">상세주소</p>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    name="addressDetail"
+                    value={editForm.addressDetail}
+                    onChange={handleInputChange}
+                    placeholder="101호"
+                    className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  />
+                ) : (
+                  <p className="font-medium">{user.addressDetail || '-'}</p>
                 )}
               </div>
             </div>
           </div>
-        )}
+        </div>
 
         {/* 계정 상태 */}
         <div className="bg-white rounded-lg shadow-md p-6">
