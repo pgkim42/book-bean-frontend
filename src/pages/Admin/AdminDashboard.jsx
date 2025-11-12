@@ -1,5 +1,9 @@
 import { Link } from 'react-router-dom';
 import { Book, Package, Users, Tag } from 'lucide-react';
+import SalesChart from '../../components/dashboard/SalesChart';
+import OrderStatusChart from '../../components/dashboard/OrderStatusChart';
+import TopBooksChart from '../../components/dashboard/TopBooksChart';
+import NewUsersChart from '../../components/dashboard/NewUsersChart';
 
 const AdminDashboard = () => {
   const menuItems = [
@@ -8,35 +12,36 @@ const AdminDashboard = () => {
       icon: Book,
       path: '/admin/books',
       description: '도서 등록, 수정, 삭제',
-      color: 'bg-blue-100 text-blue-600',
+      color: 'bg-gray-100 text-gray-900',
     },
     {
       title: '카테고리 관리',
       icon: Tag,
       path: '/admin/categories',
       description: '카테고리 등록, 수정, 삭제',
-      color: 'bg-green-100 text-green-600',
+      color: 'bg-gray-200 text-gray-900',
     },
     {
       title: '주문 관리',
       icon: Package,
       path: '/admin/orders',
       description: '주문 확인, 배송 처리',
-      color: 'bg-purple-100 text-purple-600',
+      color: 'bg-gray-300 text-gray-900',
     },
     {
       title: '사용자 관리',
       icon: Users,
       path: '/admin/users',
       description: '사용자 조회 및 관리',
-      color: 'bg-orange-100 text-orange-600',
+      color: 'bg-gray-400 text-white',
     },
   ];
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8">관리자 대시보드</h1>
+    <div className="max-w-7xl mx-auto space-y-8">
+      <h1 className="text-3xl font-bold">관리자 대시보드</h1>
 
+      {/* 관리 메뉴 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {menuItems.map((item) => {
           const Icon = item.icon;
@@ -54,6 +59,21 @@ const AdminDashboard = () => {
             </Link>
           );
         })}
+      </div>
+
+      {/* 차트 섹션 */}
+      <div className="space-y-6">
+        {/* 매출 & 주문 상태 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <SalesChart />
+          <OrderStatusChart />
+        </div>
+
+        {/* 베스트셀러 & 신규 회원 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <TopBooksChart />
+          <NewUsersChart />
+        </div>
       </div>
     </div>
   );

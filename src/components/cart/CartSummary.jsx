@@ -37,7 +37,7 @@ const CartSummary = ({ cartSummary }) => {
         </div>
         <div className="flex justify-between text-gray-700">
           <span>배송비</span>
-          <span className={shippingFee === 0 ? 'text-green-600 font-medium' : ''}>
+          <span className={shippingFee === 0 ? 'text-gray-700 font-medium' : ''}>
             {shippingFee === 0 ? '무료' : formatPrice(shippingFee)}
           </span>
         </div>
@@ -45,14 +45,14 @@ const CartSummary = ({ cartSummary }) => {
 
       {/* 무료 배송 안내 */}
       {shippingFee > 0 && remainingForFreeShipping > 0 && (
-        <div className="mb-4 p-3 bg-blue-50 rounded-lg">
-          <p className="text-sm text-blue-800">
+        <div className="mb-4 p-3 bg-gray-100 rounded-lg">
+          <p className="text-sm text-gray-800">
             <span className="font-bold">{formatPrice(remainingForFreeShipping)}</span>
             {' '}더 담으면 <span className="font-bold">무료 배송</span>!
           </p>
-          <div className="mt-2 w-full bg-blue-200 rounded-full h-2">
+          <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
             <div
-              className="bg-blue-600 h-2 rounded-full transition-all"
+              className="bg-gray-900 h-2 rounded-full transition-all"
               style={{
                 width: `${Math.min((totalPrice / FREE_SHIPPING_THRESHOLD) * 100, 100)}%`,
               }}

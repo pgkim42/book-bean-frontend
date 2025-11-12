@@ -35,9 +35,9 @@ const Login = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto">
-      <div className="bg-white rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-bold text-center mb-8">로그인</h1>
+    <div className="max-w-md mx-auto py-16">
+      <div className="bg-white rounded-3xl shadow-apple-lg p-10">
+        <h1 className="text-4xl font-semibold text-center mb-10 tracking-tight">로그인</h1>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <Input
@@ -56,14 +56,14 @@ const Login = () => {
             {...register('password')}
           />
 
-          <Button type="submit" className="w-full" loading={loading}>
+          <Button type="submit" className="w-full mt-8" loading={loading}>
             로그인
           </Button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-gray-600">
+        <div className="mt-8 text-center text-sm text-primary-500">
           계정이 없으신가요?{' '}
-          <Link to="/register" className="text-primary-600 hover:underline">
+          <Link to="/register" className="text-primary-600 hover:text-primary-700 font-medium transition-colors">
             회원가입
           </Link>
         </div>

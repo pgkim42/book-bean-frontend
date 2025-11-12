@@ -138,7 +138,7 @@ const AdminBooks = () => {
                   {formatPrice(book.salePrice)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  <span className={book.stockQuantity <= 5 ? 'text-red-600 font-bold' : ''}>
+                  <span className={book.stockQuantity <= 5 ? 'text-gray-900 font-bold' : ''}>
                     {book.stockQuantity}
                   </span>
                 </td>
@@ -146,8 +146,8 @@ const AdminBooks = () => {
                   <span
                     className={`px-2 py-1 text-xs rounded-full ${
                       book.status === 'AVAILABLE'
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-red-100 text-red-700'
+                        ? 'bg-gray-100 text-gray-900'
+                        : 'bg-gray-200 text-gray-900'
                     }`}
                   >
                     {BOOK_STATUS[book.status]}
@@ -159,13 +159,13 @@ const AdminBooks = () => {
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
                   <button
                     onClick={() => handleOpenEditModal(book)}
-                    className="text-blue-600 hover:text-blue-900 mr-3"
+                    className="text-gray-800 hover:text-gray-900 mr-3"
                   >
                     <Edit className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => handleDelete(book.id, book.title)}
-                    className="text-red-600 hover:text-red-900"
+                    className="text-gray-900 hover:text-gray-900"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>

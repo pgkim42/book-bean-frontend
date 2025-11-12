@@ -119,8 +119,8 @@ const AdminCategories = () => {
                   <span
                     className={`px-2 py-1 text-xs rounded-full ${
                       category.isActive
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-red-100 text-red-700'
+                        ? 'bg-gray-100 text-gray-900'
+                        : 'bg-gray-200 text-gray-900'
                     }`}
                   >
                     {category.isActive ? '활성' : '비활성'}
@@ -132,13 +132,13 @@ const AdminCategories = () => {
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
                   <button
                     onClick={() => handleOpenEditModal(category)}
-                    className="text-blue-600 hover:text-blue-900 mr-3"
+                    className="text-gray-800 hover:text-gray-900 mr-3"
                   >
                     <Edit className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => handleDelete(category.id, category.name)}
-                    className="text-red-600 hover:text-red-900"
+                    className="text-gray-900 hover:text-gray-900"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>

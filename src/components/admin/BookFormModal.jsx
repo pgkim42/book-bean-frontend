@@ -123,7 +123,7 @@ const BookFormModal = ({ isOpen, onClose, onSubmit, initialData, categories }) =
                 {/* 카테고리 */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    카테고리 <span className="text-red-500">*</span>
+                    카테고리 <span className="text-gray-900">*</span>
                   </label>
                   <select
                     {...register('categoryId', { valueAsNumber: true })}
@@ -137,7 +137,7 @@ const BookFormModal = ({ isOpen, onClose, onSubmit, initialData, categories }) =
                     ))}
                   </select>
                   {errors.categoryId && (
-                    <p className="mt-1 text-sm text-red-600">{errors.categoryId.message}</p>
+                    <p className="mt-1 text-sm text-gray-900">{errors.categoryId.message}</p>
                   )}
                 </div>
 
@@ -150,14 +150,14 @@ const BookFormModal = ({ isOpen, onClose, onSubmit, initialData, categories }) =
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                   {errors.isbn && (
-                    <p className="mt-1 text-sm text-red-600">{errors.isbn.message}</p>
+                    <p className="mt-1 text-sm text-gray-900">{errors.isbn.message}</p>
                   )}
                 </div>
 
                 {/* 제목 */}
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    제목 <span className="text-red-500">*</span>
+                    제목 <span className="text-gray-900">*</span>
                   </label>
                   <input
                     {...register('title')}
@@ -165,14 +165,14 @@ const BookFormModal = ({ isOpen, onClose, onSubmit, initialData, categories }) =
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                   {errors.title && (
-                    <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
+                    <p className="mt-1 text-sm text-gray-900">{errors.title.message}</p>
                   )}
                 </div>
 
                 {/* 저자 */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    저자 <span className="text-red-500">*</span>
+                    저자 <span className="text-gray-900">*</span>
                   </label>
                   <input
                     {...register('author')}
@@ -180,7 +180,7 @@ const BookFormModal = ({ isOpen, onClose, onSubmit, initialData, categories }) =
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                   {errors.author && (
-                    <p className="mt-1 text-sm text-red-600">{errors.author.message}</p>
+                    <p className="mt-1 text-sm text-gray-900">{errors.author.message}</p>
                   )}
                 </div>
 
@@ -193,7 +193,7 @@ const BookFormModal = ({ isOpen, onClose, onSubmit, initialData, categories }) =
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                   {errors.publisher && (
-                    <p className="mt-1 text-sm text-red-600">{errors.publisher.message}</p>
+                    <p className="mt-1 text-sm text-gray-900">{errors.publisher.message}</p>
                   )}
                 </div>
 
@@ -206,7 +206,7 @@ const BookFormModal = ({ isOpen, onClose, onSubmit, initialData, categories }) =
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                   {errors.publicationDate && (
-                    <p className="mt-1 text-sm text-red-600">{errors.publicationDate.message}</p>
+                    <p className="mt-1 text-sm text-gray-900">{errors.publicationDate.message}</p>
                   )}
                 </div>
 
@@ -220,14 +220,14 @@ const BookFormModal = ({ isOpen, onClose, onSubmit, initialData, categories }) =
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                   {errors.pages && (
-                    <p className="mt-1 text-sm text-red-600">{errors.pages.message}</p>
+                    <p className="mt-1 text-sm text-gray-900">{errors.pages.message}</p>
                   )}
                 </div>
 
                 {/* 정가 */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    정가 <span className="text-red-500">*</span>
+                    정가 <span className="text-gray-900">*</span>
                   </label>
                   <input
                     {...register('originalPrice', { valueAsNumber: true })}
@@ -236,14 +236,14 @@ const BookFormModal = ({ isOpen, onClose, onSubmit, initialData, categories }) =
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                   {errors.originalPrice && (
-                    <p className="mt-1 text-sm text-red-600">{errors.originalPrice.message}</p>
+                    <p className="mt-1 text-sm text-gray-900">{errors.originalPrice.message}</p>
                   )}
                 </div>
 
                 {/* 판매가 */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    판매가 <span className="text-red-500">*</span>
+                    판매가 <span className="text-gray-900">*</span>
                   </label>
                   <input
                     {...register('salePrice', { valueAsNumber: true })}
@@ -252,7 +252,7 @@ const BookFormModal = ({ isOpen, onClose, onSubmit, initialData, categories }) =
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                   {errors.salePrice && (
-                    <p className="mt-1 text-sm text-red-600">{errors.salePrice.message}</p>
+                    <p className="mt-1 text-sm text-gray-900">{errors.salePrice.message}</p>
                   )}
                 </div>
 
@@ -268,7 +268,7 @@ const BookFormModal = ({ isOpen, onClose, onSubmit, initialData, categories }) =
                     className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
                   />
                   {errors.discountRate && (
-                    <p className="mt-1 text-sm text-red-600">{errors.discountRate.message}</p>
+                    <p className="mt-1 text-sm text-gray-900">{errors.discountRate.message}</p>
                   )}
                 </div>
 
@@ -282,7 +282,7 @@ const BookFormModal = ({ isOpen, onClose, onSubmit, initialData, categories }) =
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                   {errors.stockQuantity && (
-                    <p className="mt-1 text-sm text-red-600">{errors.stockQuantity.message}</p>
+                    <p className="mt-1 text-sm text-gray-900">{errors.stockQuantity.message}</p>
                   )}
                 </div>
 
@@ -297,7 +297,7 @@ const BookFormModal = ({ isOpen, onClose, onSubmit, initialData, categories }) =
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                   {errors.coverImageUrl && (
-                    <p className="mt-1 text-sm text-red-600">{errors.coverImageUrl.message}</p>
+                    <p className="mt-1 text-sm text-gray-900">{errors.coverImageUrl.message}</p>
                   )}
                 </div>
 
@@ -310,7 +310,7 @@ const BookFormModal = ({ isOpen, onClose, onSubmit, initialData, categories }) =
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                   {errors.description && (
-                    <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
+                    <p className="mt-1 text-sm text-gray-900">{errors.description.message}</p>
                   )}
                 </div>
               </div>

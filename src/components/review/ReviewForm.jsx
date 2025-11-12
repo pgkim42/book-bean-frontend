@@ -51,7 +51,7 @@ const ReviewForm = ({ bookId, onSubmit, onCancel, initialData }) => {
       {/* 평점 */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          평점 <span className="text-red-500">*</span>
+          평점 <span className="text-gray-900">*</span>
         </label>
         <div className="flex items-center space-x-1">
           {[1, 2, 3, 4, 5].map((star) => (
@@ -66,7 +66,7 @@ const ReviewForm = ({ bookId, onSubmit, onCancel, initialData }) => {
               <Star
                 className={`w-8 h-8 transition-colors ${
                   star <= (hoveredRating || currentRating)
-                    ? 'fill-yellow-400 text-yellow-400'
+                    ? 'fill-gray-700 text-gray-700'
                     : 'text-gray-300'
                 }`}
               />
@@ -79,14 +79,14 @@ const ReviewForm = ({ bookId, onSubmit, onCancel, initialData }) => {
         <input type="hidden" {...register('rating', { valueAsNumber: true })} />
         <input type="hidden" {...register('bookId', { valueAsNumber: true })} />
         {errors.rating && (
-          <p className="mt-1 text-sm text-red-600">{errors.rating.message}</p>
+          <p className="mt-1 text-sm text-gray-900">{errors.rating.message}</p>
         )}
       </div>
 
       {/* 리뷰 제목 */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          리뷰 제목 <span className="text-red-500">*</span>
+          리뷰 제목 <span className="text-gray-900">*</span>
         </label>
         <input
           {...register('title')}
@@ -95,14 +95,14 @@ const ReviewForm = ({ bookId, onSubmit, onCancel, initialData }) => {
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
         />
         {errors.title && (
-          <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
+          <p className="mt-1 text-sm text-gray-900">{errors.title.message}</p>
         )}
       </div>
 
       {/* 리뷰 내용 */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          리뷰 내용 <span className="text-red-500">*</span>
+          리뷰 내용 <span className="text-gray-900">*</span>
         </label>
         <textarea
           {...register('content')}
@@ -113,7 +113,7 @@ const ReviewForm = ({ bookId, onSubmit, onCancel, initialData }) => {
         <div className="flex justify-between mt-1">
           <div>
             {errors.content && (
-              <p className="text-sm text-red-600">{errors.content.message}</p>
+              <p className="text-sm text-gray-900">{errors.content.message}</p>
             )}
           </div>
           <p className="text-sm text-gray-500">

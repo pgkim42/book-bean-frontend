@@ -40,7 +40,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
             {formatPrice(item.bookCurrentPrice)}
           </span>
           {item.priceChanged && (
-            <p className="text-xs text-orange-600 mt-1">
+            <p className="text-xs text-gray-700 mt-1">
               가격이 변동되었습니다 (담았을 때: {formatPrice(item.priceAtAdded)})
             </p>
           )}
@@ -83,7 +83,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
           variant="outline"
           size="sm"
           onClick={() => onRemove(item.id)}
-          className="text-red-600 hover:bg-red-50 border-red-300"
+          className="text-gray-900 hover:bg-gray-100 border-gray-400"
         >
           <Trash2 className="w-4 h-4" />
         </Button>

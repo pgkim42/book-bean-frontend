@@ -148,6 +148,23 @@ const Profile = () => {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    if (
+      window.confirm(
+        '정말로 탈퇴하시겠습니까?\n\n탈퇴하시면 모든 정보가 비활성화되며 복구할 수 없습니다.'
+      )
+    ) {
+      try {
+        await userService.deleteUser(user.id);
+        toast.success('회원 탈퇴가 완료되었습니다');
+        logout();
+        navigate('/');
+      } catch (error) {
+        toast.error(error.message || '회원 탈퇴에 실패했습니다');
+      }
+    }
+  };
+
   if (loading) {
     return <Loading />;
   }
@@ -329,8 +346,8 @@ const Profile = () => {
               <span
                 className={`px-3 py-1 rounded-full text-sm font-medium ${
                   user.emailVerified
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-yellow-100 text-yellow-700'
+                    ? 'bg-gray-100 text-gray-900'
+                    : 'bg-gray-100 text-gray-800'
                 }`}
               >
                 {user.emailVerified ? '인증 완료' : '미인증'}
@@ -341,8 +358,8 @@ const Profile = () => {
               <span
                 className={`px-3 py-1 rounded-full text-sm font-medium ${
                   user.isActive
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-red-100 text-red-700'
+                    ? 'bg-gray-100 text-gray-900'
+                    : 'bg-gray-200 text-gray-900'
                 }`}
               >
                 {user.isActive ? '활성' : '비활성'}
@@ -427,6 +444,21 @@ const Profile = () => {
               장바구니
             </Button>
           </div>
+        </div>
+
+        {/* 위험한 액션 */}
+        <div className="bg-gray-100 rounded-lg shadow-md p-6 border border-gray-300">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">회원 탈퇴</h2>
+          <p className="text-gray-700 mb-4">
+            탈퇴하시면 모든 정보가 비활성화되며 복구할 수 없습니다.
+          </p>
+          <Button
+            onClick={handleDeleteAccount}
+            variant="outline"
+            className="text-gray-900 border-gray-400 hover:bg-gray-200"
+          >
+            회원 탈퇴
+          </Button>
         </div>
 
         {/* 로그아웃 */}

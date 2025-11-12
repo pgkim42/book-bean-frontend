@@ -51,9 +51,9 @@ const Register = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto">
-      <div className="bg-white rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-bold text-center mb-8">회원가입</h1>
+    <div className="max-w-md mx-auto py-16">
+      <div className="bg-white rounded-3xl shadow-apple-lg p-10">
+        <h1 className="text-4xl font-semibold text-center mb-10 tracking-tight">회원가입</h1>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <Input
@@ -96,14 +96,14 @@ const Register = () => {
             {...register('phone')}
           />
 
-          <Button type="submit" className="w-full" loading={loading}>
+          <Button type="submit" className="w-full mt-8" loading={loading}>
             회원가입
           </Button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-gray-600">
+        <div className="mt-8 text-center text-sm text-primary-500">
           이미 계정이 있으신가요?{' '}
-          <Link to="/login" className="text-primary-600 hover:underline">
+          <Link to="/login" className="text-primary-600 hover:text-primary-700 font-medium transition-colors">
             로그인
           </Link>
         </div>

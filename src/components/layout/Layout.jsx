@@ -1,9 +1,27 @@
+import { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Header from './Header';
 import Footer from './Footer';
+import useAuthStore from '../../store/authStore';
+import useWishlistStore from '../../store/wishlistStore';
+import useCartStore from '../../store/cartStore';
 
 const Layout = () => {
+  const { isAuthenticated } = useAuthStore();
+  const { initialize: initializeWishlist } = useWishlistStore();
+  const { fetchCart } = useCartStore();
+
+  useEffect(() => {
+    // 위시리스트 초기화
+    initializeWishlist(isAuthenticated);
+
+    // 로그인 사용자는 장바구니도 가져오기
+    if (isAuthenticated) {
+      fetchCart();
+    }
+  }, [isAuthenticated, initializeWishlist, fetchCart]);
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />

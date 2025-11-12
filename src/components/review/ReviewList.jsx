@@ -3,6 +3,7 @@ import { Star } from 'lucide-react';
 import toast from 'react-hot-toast';
 import reviewService from '../../services/reviewService';
 import ReviewItem from './ReviewItem';
+import ReviewSortFilter from './ReviewSortFilter';
 import Pagination from '../common/Pagination';
 import Loading from '../common/Loading';
 
@@ -12,20 +13,35 @@ const ReviewList = ({ bookId, onEditReview, refreshTrigger }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [stats, setStats] = useState({ totalReviews: 0, avgRating: 0 });
+  const [sort, setSort] = useState('createdAt,desc');
+  const [ratingFilter, setRatingFilter] = useState('all');
   const pageSize = 10;
 
   useEffect(() => {
     fetchReviews();
-  }, [bookId, currentPage, refreshTrigger]);
+  }, [bookId, currentPage, refreshTrigger, sort, ratingFilter]);
 
   const fetchReviews = async () => {
     setLoading(true);
     try {
-      const response = await reviewService.getBookReviews(bookId, {
+      const params = {
         page: currentPage,
         size: pageSize,
-        sort: 'createdAt,desc',
-      });
+        sort,
+      };
+
+      // 평점 필터 추가
+      if (ratingFilter !== 'all') {
+        if (ratingFilter === '5') {
+          params.rating = 5;
+        } else if (ratingFilter === '4') {
+          params.minRating = 4;
+        } else if (ratingFilter === '3') {
+          params.maxRating = 3;
+        }
+      }
+
+      const response = await reviewService.getBookReviews(bookId, params);
 
       setReviews(response.data.content || []);
       setTotalPages(response.data.totalPages || 0);
@@ -72,13 +88,23 @@ const ReviewList = ({ bookId, onEditReview, refreshTrigger }) => {
     return <Loading />;
   }
 
+  const handleSortChange = (newSort) => {
+    setSort(newSort);
+    setCurrentPage(0);
+  };
+
+  const handleRatingFilterChange = (newFilter) => {
+    setRatingFilter(newFilter);
+    setCurrentPage(0);
+  };
+
   return (
     <div className="space-y-6">
       {/* 리뷰 통계 */}
       <div className="bg-gray-50 rounded-lg p-6">
         <div className="flex items-center space-x-4">
           <div className="flex items-center">
-            <Star className="w-6 h-6 fill-yellow-400 text-yellow-400" />
+            <Star className="w-6 h-6 fill-gray-700 text-gray-700" />
             <span className="ml-2 text-3xl font-bold text-gray-900">
               {stats.avgRating}
             </span>
@@ -89,6 +115,14 @@ const ReviewList = ({ bookId, onEditReview, refreshTrigger }) => {
           </div>
         </div>
       </div>
+
+      {/* 정렬 및 필터 */}
+      <ReviewSortFilter
+        sort={sort}
+        ratingFilter={ratingFilter}
+        onSortChange={handleSortChange}
+        onRatingFilterChange={handleRatingFilterChange}
+      />
 
       {/* 리뷰 목록 */}
       {reviews.length === 0 ? (

@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ShoppingCart, ArrowLeft, Edit2 } from 'lucide-react';
+import { ShoppingCart, ArrowLeft, Edit2, Heart } from 'lucide-react';
 import toast from 'react-hot-toast';
 import bookService from '../services/bookService';
 import reviewService from '../services/reviewService';
 import useCartStore from '../store/cartStore';
 import useAuthStore from '../store/authStore';
+import useWishlistStore from '../store/wishlistStore';
+import useRecentlyViewed from '../hooks/useRecentlyViewed';
 import Button from '../components/common/Button';
-import Loading from '../components/common/Loading';
+import BookDetailSkeleton from '../components/common/BookDetailSkeleton';
 import ReviewList from '../components/review/ReviewList';
 import ReviewForm from '../components/review/ReviewForm';
+import RecentlyViewedSection from '../components/recentlyViewed/RecentlyViewedSection';
 import { formatPrice } from '../utils/formatters';
 import { BOOK_STATUS } from '../utils/constants';
 
@@ -18,6 +21,8 @@ const BookDetail = () => {
   const navigate = useNavigate();
   const { addToCart } = useCartStore();
   const { isAuthenticated } = useAuthStore();
+  const { isInWishlist, toggleWishlist } = useWishlistStore();
+  useRecentlyViewed(book);
 
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -25,6 +30,8 @@ const BookDetail = () => {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviewRefreshTrigger, setReviewRefreshTrigger] = useState(0);
   const [editingReview, setEditingReview] = useState(null);
+
+  const isWishlisted = book ? isInWishlist(book.id) : false;
 
   useEffect(() => {
     fetchBookDetail();
@@ -101,8 +108,21 @@ const BookDetail = () => {
     }
   };
 
+  const handleToggleWishlist = async () => {
+    const success = await toggleWishlist(book.id);
+    if (success) {
+      if (isWishlisted) {
+        toast.success('위시리스트에서 제거되었습니다');
+      } else {
+        toast.success('위시리스트에 추가되었습니다');
+      }
+    } else {
+      toast.error('위시리스트 처리에 실패했습니다');
+    }
+  };
+
   if (loading) {
-    return <Loading />;
+    return <BookDetailSkeleton />;
   }
 
   if (!book) {
@@ -147,7 +167,7 @@ const BookDetail = () => {
               {book.categoryName || '미분류'}
             </span>
             {book.status !== 'AVAILABLE' && (
-              <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">
+              <span className="px-3 py-1 bg-gray-200 text-gray-900 rounded-full text-sm font-medium">
                 {BOOK_STATUS[book.status]}
               </span>
             )}
@@ -172,7 +192,7 @@ const BookDetail = () => {
                   <span className="text-sm text-gray-400 line-through">
                     {formatPrice(book.originalPrice)}
                   </span>
-                  <span className="text-sm font-bold text-red-500">
+                  <span className="text-sm font-bold text-gray-900">
                     {book.discountRate}% 할인
                   </span>
                 </div>
@@ -190,7 +210,7 @@ const BookDetail = () => {
                 재고: <span className="font-bold">{book.stockQuantity}</span>권
               </p>
             ) : (
-              <p className="text-red-600 font-bold">품절</p>
+              <p className="text-gray-900 font-bold">품절</p>
             )}
           </div>
 
@@ -218,14 +238,29 @@ const BookDetail = () => {
                 </div>
               </div>
 
-              <Button
-                onClick={handleAddToCart}
-                className="w-full flex items-center justify-center space-x-2"
-                size="lg"
-              >
-                <ShoppingCart className="w-5 h-5" />
-                <span>장바구니 담기</span>
-              </Button>
+              <div className="flex gap-3">
+                <Button
+                  onClick={handleAddToCart}
+                  className="flex-1 flex items-center justify-center space-x-2"
+                  size="lg"
+                >
+                  <ShoppingCart className="w-5 h-5" />
+                  <span>장바구니 담기</span>
+                </Button>
+                <Button
+                  onClick={handleToggleWishlist}
+                  variant="outline"
+                  size="lg"
+                  className="flex items-center justify-center space-x-2"
+                >
+                  <Heart
+                    className={`w-5 h-5 ${
+                      isWishlisted ? 'fill-red-500 text-red-500' : ''
+                    }`}
+                  />
+                  <span>{isWishlisted ? '찜 취소' : '찜하기'}</span>
+                </Button>
+              </div>
             </div>
           )}
         </div>
@@ -270,6 +305,9 @@ const BookDetail = () => {
           refreshTrigger={reviewRefreshTrigger}
         />
       </div>
+
+      {/* 최근 본 상품 */}
+      <RecentlyViewedSection currentBookId={parseInt(id)} />
     </div>
   );
 };

@@ -79,7 +79,7 @@ const CategoryFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
               {/* 카테고리명 */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  카테고리명 <span className="text-red-500">*</span>
+                  카테고리명 <span className="text-gray-900">*</span>
                 </label>
                 <input
                   {...register('name')}
@@ -87,7 +87,7 @@ const CategoryFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
                 {errors.name && (
-                  <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+                  <p className="mt-1 text-sm text-gray-900">{errors.name.message}</p>
                 )}
               </div>
 
@@ -100,14 +100,14 @@ const CategoryFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
                 {errors.description && (
-                  <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
+                  <p className="mt-1 text-sm text-gray-900">{errors.description.message}</p>
                 )}
               </div>
 
               {/* 표시 순서 */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  표시 순서 <span className="text-red-500">*</span>
+                  표시 순서 <span className="text-gray-900">*</span>
                 </label>
                 <input
                   {...register('displayOrder', { valueAsNumber: true })}
@@ -116,7 +116,7 @@ const CategoryFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
                 {errors.displayOrder && (
-                  <p className="mt-1 text-sm text-red-600">{errors.displayOrder.message}</p>
+                  <p className="mt-1 text-sm text-gray-900">{errors.displayOrder.message}</p>
                 )}
               </div>
 

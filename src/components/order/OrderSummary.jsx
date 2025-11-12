@@ -14,7 +14,7 @@ const OrderSummary = ({ totalBookPrice, deliveryFee }) => {
         </div>
         <div className="flex justify-between text-gray-700">
           <span>배송비</span>
-          <span className={deliveryFee === 0 ? 'text-green-600 font-medium' : ''}>
+          <span className={deliveryFee === 0 ? 'text-gray-700 font-medium' : ''}>
             {deliveryFee === 0 ? '무료' : formatPrice(deliveryFee)}
           </span>
         </div>

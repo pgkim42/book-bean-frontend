@@ -1,21 +1,26 @@
 import { useState } from 'react';
-import { Star, ThumbsUp, ThumbsDown, Edit, Trash2, ShieldCheck } from 'lucide-react';
+import { Star, Edit, Trash2, ShieldCheck } from 'lucide-react';
 import { formatDate } from '../../utils/formatters';
-import Button from '../common/Button';
+import ReviewHelpfulButton from './ReviewHelpfulButton';
 import useAuthStore from '../../store/authStore';
 
-const ReviewItem = ({ review, onEdit, onDelete, onVote, onCancelVote }) => {
-  const { user } = useAuthStore();
+const ReviewItem = ({ review, onEdit, onDelete, onVote }) => {
+  const { user, isAuthenticated } = useAuthStore();
   const [isExpanded, setIsExpanded] = useState(false);
 
   const isMyReview = user && user.email === review.userName; // userId 비교가 더 정확하지만, userName으로 우선 처리
   const contentLength = review.content?.length || 0;
   const shouldTruncate = contentLength > 200;
 
-  const handleVote = async (voteType) => {
-    if (onVote) {
-      await onVote(review.id, voteType);
+  const handleHelpfulVote = async (reviewId, vote) => {
+    if (!isAuthenticated) {
+      return false;
     }
+    if (onVote) {
+      await onVote(reviewId, vote);
+      return true;
+    }
+    return false;
   };
 
   return (
@@ -31,7 +36,7 @@ const ReviewItem = ({ review, onEdit, onDelete, onVote, onCancelVote }) => {
                   key={star}
                   className={`w-4 h-4 ${
                     star <= review.rating
-                      ? 'fill-yellow-400 text-yellow-400'
+                      ? 'fill-gray-700 text-gray-700'
                       : 'text-gray-300'
                   }`}
                 />
@@ -51,7 +56,7 @@ const ReviewItem = ({ review, onEdit, onDelete, onVote, onCancelVote }) => {
             {review.isVerifiedPurchase && (
               <>
                 <span>·</span>
-                <div className="flex items-center space-x-1 text-green-600">
+                <div className="flex items-center space-x-1 text-gray-700">
                   <ShieldCheck className="w-4 h-4" />
                   <span>구매 인증</span>
                 </div>
@@ -66,7 +71,7 @@ const ReviewItem = ({ review, onEdit, onDelete, onVote, onCancelVote }) => {
             {onEdit && (
               <button
                 onClick={() => onEdit(review)}
-                className="p-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                className="p-2 text-gray-800 hover:bg-gray-50 rounded-md transition-colors"
               >
                 <Edit className="w-4 h-4" />
               </button>
@@ -74,7 +79,7 @@ const ReviewItem = ({ review, onEdit, onDelete, onVote, onCancelVote }) => {
             {onDelete && (
               <button
                 onClick={() => onDelete(review.id)}
-                className="p-2 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                className="p-2 text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -100,29 +105,15 @@ const ReviewItem = ({ review, onEdit, onDelete, onVote, onCancelVote }) => {
         )}
       </div>
 
-      {/* 투표 */}
-      {onVote && (
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={() => handleVote('UP')}
-            className="flex items-center space-x-1 px-3 py-1.5 rounded-md border border-gray-300 hover:bg-gray-50 transition-colors"
-          >
-            <ThumbsUp className="w-4 h-4" />
-            <span className="text-sm">도움됨</span>
-            <span className="text-sm font-medium text-gray-600">
-              {review.voteUpCount || 0}
-            </span>
-          </button>
-          <button
-            onClick={() => handleVote('DOWN')}
-            className="flex items-center space-x-1 px-3 py-1.5 rounded-md border border-gray-300 hover:bg-gray-50 transition-colors"
-          >
-            <ThumbsDown className="w-4 h-4" />
-            <span className="text-sm">도움 안됨</span>
-            <span className="text-sm font-medium text-gray-600">
-              {review.voteDownCount || 0}
-            </span>
-          </button>
+      {/* 도움돼요 버튼 */}
+      {onVote && !isMyReview && (
+        <div className="flex items-center">
+          <ReviewHelpfulButton
+            reviewId={review.id}
+            initialCount={review.helpfulCount || 0}
+            initialVoted={review.userVoted || false}
+            onVote={handleHelpfulVote}
+          />
         </div>
       )}
     </div>

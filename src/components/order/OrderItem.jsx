@@ -45,7 +45,7 @@ const OrderItem = ({ item, isDelivered, hasReviewed, onWriteReview }) => {
         )}
         {isDelivered && hasReviewed && (
           <div className="mt-3">
-            <span className="text-sm text-green-600 font-medium">
+            <span className="text-sm text-gray-700 font-medium">
               ✓ 리뷰 작성 완료
             </span>
           </div>

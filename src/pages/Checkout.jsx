@@ -142,7 +142,7 @@ const Checkout = () => {
                     placeholder="배송 시 요청사항을 입력해주세요"
                   />
                   {errors.deliveryRequest && (
-                    <p className="mt-1 text-sm text-red-600">{errors.deliveryRequest.message}</p>
+                    <p className="mt-1 text-sm text-gray-900">{errors.deliveryRequest.message}</p>
                   )}
                 </div>
               </div>
@@ -165,7 +165,7 @@ const Checkout = () => {
                 ))}
               </div>
               {errors.paymentMethod && (
-                <p className="mt-2 text-sm text-red-600">{errors.paymentMethod.message}</p>
+                <p className="mt-2 text-sm text-gray-900">{errors.paymentMethod.message}</p>
               )}
             </div>
 
