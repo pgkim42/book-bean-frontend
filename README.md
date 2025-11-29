@@ -1,16 +1,326 @@
-# React + Vite
+# Book-Bean Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React 19 + Vite 기반 온라인 책 쇼핑몰 프론트엔드
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 프로젝트 개요
 
-## React Compiler
+**Book-Bean Frontend**는 최신 React 생태계 기술을 활용한 온라인 책 쇼핑몰 SPA입니다.
+사용자 경험(UX)을 고려한 **Warm & Cozy 디자인 시스템**, **서버 상태 관리**, **폼 유효성 검증** 등 실무에서 필요한 기술들을 학습하고 적용했습니다.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 주요 구현 사항
+- **React 19**: 최신 React 기능 활용
+- **TanStack Query**: 서버 상태 관리 및 캐싱
+- **Zustand**: 클라이언트 상태 관리 (장바구니, 인증)
+- **React Hook Form + Zod**: 타입 안전한 폼 검증
+- **Tailwind CSS**: Warm & Cozy 커스텀 디자인 시스템
+- **반응형 UI**: 모바일부터 데스크톱까지 완벽 지원
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 기술 스택
+
+| 분류 | 기술 | 설명 |
+|------|------|------|
+| **Core** | React 19, Vite 7 | 최신 버전 활용 |
+| **Routing** | React Router v7 | SPA 라우팅 |
+| **Server State** | TanStack Query v5 | 서버 상태 관리, 캐싱 |
+| **Client State** | Zustand v5 | 경량 상태 관리 |
+| **Form** | React Hook Form + Zod | 타입 안전한 폼 검증 |
+| **Styling** | Tailwind CSS 3.4 | 유틸리티 기반 CSS |
+| **UI Components** | Headless UI, Lucide React | 접근성 준수 UI |
+| **Charts** | Recharts | 관리자 대시보드 차트 |
+| **HTTP Client** | Axios | API 통신 |
+| **Toast** | React Hot Toast | 알림 메시지 |
+| **Carousel** | Swiper | 이미지 슬라이더 |
+| **Date** | date-fns | 날짜 처리 |
+
+---
+
+## 주요 기능
+
+### 1. 사용자 기능
+
+#### 📚 책 탐색
+- 카테고리별 필터링
+- 가격대 필터 (Range Slider)
+- 평점 필터
+- 정렬 옵션 (최신순, 인기순, 가격순)
+- 키워드 검색
+- 페이지네이션
+
+#### 🛒 장바구니
+- 장바구니 담기/삭제/수량 변경
+- 전체 선택/개별 선택
+- 실시간 합계 계산
+- Zustand로 상태 관리
+
+#### 📦 주문/결제
+- 배송지 정보 입력 (React Hook Form)
+- 쿠폰 선택 및 할인 적용
+- 결제 수단 선택
+- 주문 내역 조회
+
+#### 🎟️ 쿠폰
+- 사용 가능한 쿠폰 목록 조회
+- 쿠폰 선택 시 할인 금액 미리보기
+- 정액/정률/배송비 무료 쿠폰 지원
+
+#### ⭐ 리뷰
+- 구매 상품 리뷰 작성
+- 별점 (1~5점)
+- 도움됨/도움 안됨 투표
+- 리뷰 정렬 및 필터
+
+### 2. 관리자 기능
+
+#### 📊 대시보드
+- 매출 차트 (Recharts)
+- 주문 현황 차트
+- 인기 도서 순위
+- 신규 가입자 추이
+
+#### 📋 관리 기능
+- 책 관리 (CRUD)
+- 카테고리 관리
+- 주문 관리 (상태 변경)
+- 사용자 관리
+
+---
+
+## 학습 포인트
+
+### 1. 서버 상태 관리 (TanStack Query)
+```javascript
+// 캐싱 및 자동 갱신
+const { data, isLoading, error } = useQuery({
+  queryKey: ['books', { page, category, sort }],
+  queryFn: () => bookService.getBooks(params),
+  staleTime: 5 * 60 * 1000, // 5분 캐싱
+});
+
+// 낙관적 업데이트
+const mutation = useMutation({
+  mutationFn: cartService.updateQuantity,
+  onMutate: async (newData) => {
+    // 즉시 UI 업데이트
+  },
+});
+```
+
+**면접 포인트:**
+- `staleTime` vs `cacheTime` 차이
+- 쿼리 키 설계 전략
+- 낙관적 업데이트 구현
+
+### 2. 클라이언트 상태 관리 (Zustand)
+```javascript
+const useCartStore = create(
+  persist(
+    (set, get) => ({
+      items: [],
+      addItem: (book) => set((state) => ({
+        items: [...state.items, { ...book, quantity: 1 }]
+      })),
+      // ...
+    }),
+    { name: 'cart-storage' } // localStorage 자동 저장
+  )
+);
+```
+
+**면접 포인트:**
+- Redux vs Zustand 선택 이유
+- persist 미들웨어로 상태 영속화
+- immer 없이도 불변성 관리
+
+### 3. 폼 검증 (React Hook Form + Zod)
+```javascript
+const checkoutSchema = z.object({
+  recipientName: z.string().min(1, '받는 사람을 입력해주세요'),
+  recipientPhone: z.string().regex(/^010-\d{4}-\d{4}$/, '올바른 형식'),
+  deliveryAddress: z.string().min(1, '주소를 입력해주세요'),
+});
+
+const { register, handleSubmit, formState: { errors } } = useForm({
+  resolver: zodResolver(checkoutSchema),
+});
+```
+
+**면접 포인트:**
+- 스키마 기반 검증의 장점
+- 타입 안전성 확보
+- 커스텀 에러 메시지
+
+### 4. 디자인 시스템 (Tailwind CSS)
+```javascript
+// tailwind.config.js - Warm & Cozy 컬러 팔레트
+colors: {
+  primary: {
+    50: '#fef7f0',   // 아이보리
+    500: '#c9a96e',  // 골드 브라운
+    600: '#b8956a',
+  },
+  accent: {
+    500: '#6b8e6b',  // 세이지 그린
+  },
+}
+```
+
+**면접 포인트:**
+- 커스텀 테마 확장
+- 디자인 토큰 활용
+- 일관된 컬러 시스템
+
+### 5. 컴포넌트 설계
+```
+┌─────────────────────────────────────────────────────┐
+│ components/                                          │
+├─────────────────────────────────────────────────────┤
+│ common/     → Button, Input, Card, Badge, Skeleton  │
+│ layout/     → Header, Footer, Layout                │
+│ book/       → BookCard, CategoryFilter              │
+│ cart/       → CartItem, CartSummary                 │
+│ order/      → OrderItem, OrderSummary               │
+│ review/     → ReviewForm, ReviewItem, ReviewList    │
+│ filter/     → FilterSidebar, PriceRangeSlider       │
+│ admin/      → BookFormModal, CategoryFormModal      │
+│ dashboard/  → SalesChart, OrderStatusChart          │
+└─────────────────────────────────────────────────────┘
+```
+
+**면접 포인트:**
+- Atomic Design 원칙
+- 재사용 가능한 컴포넌트 설계
+- Props 인터페이스 설계
+
+---
+
+## 프로젝트 구조
+
+```
+book-bean-frontend/
+├── src/
+│   ├── components/
+│   │   ├── common/        # 공통 UI (Button, Input, Card...)
+│   │   ├── layout/        # 레이아웃 (Header, Footer)
+│   │   ├── book/          # 책 관련 (BookCard, CategoryFilter)
+│   │   ├── cart/          # 장바구니 (CartItem, CartSummary)
+│   │   ├── order/         # 주문 (OrderItem, OrderSummary)
+│   │   ├── review/        # 리뷰 (ReviewForm, ReviewItem)
+│   │   ├── filter/        # 필터 (FilterSidebar, PriceRangeSlider)
+│   │   ├── admin/         # 관리자 모달
+│   │   └── dashboard/     # 대시보드 차트
+│   ├── pages/
+│   │   ├── Admin/         # 관리자 페이지
+│   │   ├── Home.jsx       # 메인 페이지
+│   │   ├── Books.jsx      # 책 목록
+│   │   ├── BookDetail.jsx # 책 상세
+│   │   ├── Cart.jsx       # 장바구니
+│   │   ├── Checkout.jsx   # 주문/결제
+│   │   ├── Orders.jsx     # 주문 내역
+│   │   └── ...
+│   ├── services/          # API 서비스
+│   │   ├── api.js         # Axios 인스턴스
+│   │   ├── bookService.js
+│   │   ├── cartService.js
+│   │   ├── orderService.js
+│   │   ├── couponService.js  # 쿠폰 API ⭐
+│   │   └── ...
+│   ├── store/             # Zustand 스토어
+│   │   ├── authStore.js   # 인증 상태
+│   │   └── cartStore.js   # 장바구니 상태
+│   ├── hooks/             # 커스텀 훅
+│   │   ├── useRecentlyViewed.js
+│   │   └── useStatistics.js
+│   ├── utils/             # 유틸리티
+│   │   ├── formatters.js  # 가격 포맷팅
+│   │   └── constants.js   # 상수 정의
+│   ├── router/            # 라우팅 설정
+│   └── main.jsx           # 엔트리 포인트
+├── tailwind.config.js     # Tailwind 설정 (Warm & Cozy)
+├── vite.config.js         # Vite 설정
+└── package.json
+```
+
+---
+
+## 시작하기
+
+### 필수 요구사항
+- Node.js 18+
+- npm 또는 yarn
+
+### 설치 및 실행
+```bash
+# 의존성 설치
+npm install
+
+# 개발 서버 실행
+npm run dev
+
+# 프로덕션 빌드
+npm run build
+
+# 빌드 미리보기
+npm run preview
+```
+
+### 환경 변수
+```env
+# .env.development
+VITE_API_URL=http://localhost:8080/api/v1
+
+# .env.production
+VITE_API_URL=https://api.bookbean.com/api/v1
+```
+
+---
+
+## 주요 화면
+
+### 사용자 화면
+| 화면 | 설명 |
+|------|------|
+| `/` | 메인 페이지 (배너, 추천 도서) |
+| `/books` | 책 목록 (필터, 정렬, 페이지네이션) |
+| `/books/:id` | 책 상세 (리뷰, 장바구니 담기) |
+| `/cart` | 장바구니 |
+| `/checkout` | 주문/결제 (쿠폰 적용) |
+| `/orders` | 주문 내역 |
+| `/orders/:id` | 주문 상세 |
+| `/profile` | 프로필 |
+| `/wishlist` | 위시리스트 |
+
+### 관리자 화면
+| 화면 | 설명 |
+|------|------|
+| `/admin` | 관리자 대시보드 (차트) |
+| `/admin/books` | 책 관리 |
+| `/admin/categories` | 카테고리 관리 |
+| `/admin/orders` | 주문 관리 |
+| `/admin/users` | 사용자 관리 |
+
+---
+
+## UX 개선 사항
+
+### 1. 로딩 상태
+- Skeleton UI로 레이아웃 유지
+- 버튼 로딩 상태 표시
+
+### 2. 에러 처리
+- React Hot Toast로 사용자 친화적 알림
+- API 에러 메시지 표시
+
+### 3. 반응형 디자인
+- 모바일: 1열 그리드
+- 태블릿: 2열 그리드
+- 데스크톱: 3-4열 그리드
+
+### 4. 접근성
+- Headless UI로 키보드 내비게이션
+- 시맨틱 HTML 구조
+- ARIA 속성 적용
+
