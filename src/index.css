@@ -3,50 +3,214 @@
 @tailwind utilities;
 
 @layer base {
-  /* Apple-style base styles */
+  /* Warm & Cozy 기본 스타일 */
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply bg-white text-primary-600 antialiased;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    @apply bg-warm-50 text-warm-800;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
+  /* 타이포그래피 */
   h1, h2, h3, h4, h5, h6 {
-    @apply text-primary-600 font-semibold tracking-tight;
+    @apply text-warm-900 font-semibold tracking-tight;
   }
 
   h1 {
-    @apply text-5xl md:text-6xl lg:text-7xl;
-  }
-
-  h2 {
     @apply text-4xl md:text-5xl lg:text-6xl;
   }
 
+  h2 {
+    @apply text-3xl md:text-4xl lg:text-5xl;
+  }
+
   h3 {
-    @apply text-3xl md:text-4xl;
+    @apply text-2xl md:text-3xl;
+  }
+
+  h4 {
+    @apply text-xl md:text-2xl;
   }
 
   p {
-    @apply text-primary-500 leading-relaxed;
+    @apply text-warm-600 leading-relaxed;
+  }
+
+  a {
+    @apply transition-colors duration-200;
+  }
+
+  /* 포커스 스타일 */
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary-500 ring-offset-2 ring-offset-warm-50;
+  }
+
+  /* 스크롤바 스타일링 (Webkit) */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-warm-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-warm-300 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-warm-400;
+  }
+
+  /* 선택 스타일 */
+  ::selection {
+    @apply bg-primary-200 text-primary-900;
+  }
+}
+
+@layer components {
+  /* 카드 컴포넌트 기본 스타일 */
+  .card {
+    @apply bg-white rounded-2xl shadow-card transition-all duration-300;
+  }
+
+  .card:hover {
+    @apply shadow-card-hover -translate-y-1;
+  }
+
+  /* 버튼 호버 효과 */
+  .btn-hover {
+    @apply transition-all duration-200 hover:scale-[1.02] active:scale-[0.98];
+  }
+
+  /* 링크 언더라인 애니메이션 */
+  .link-underline {
+    @apply relative;
+  }
+
+  .link-underline::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-primary-500 transition-all duration-300;
+  }
+
+  .link-underline:hover::after {
+    @apply w-full;
+  }
+
+  /* 유리 효과 */
+  .glass {
+    @apply bg-white/80 backdrop-blur-md;
+  }
+
+  /* 그라데이션 텍스트 */
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent;
   }
 }
 
 @layer utilities {
-  /* Apple-style scroll behavior */
-  .smooth-scroll {
-    scroll-behavior: smooth;
-  }
-
-  /* Fade-in animation classes */
+  /* 페이드 인 섹션 */
   .fade-in-section {
     opacity: 0;
     transform: translateY(20px);
-    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
   }
 
   .fade-in-section.is-visible {
     opacity: 1;
     transform: translateY(0);
   }
+
+  /* 스켈레톤 시머 효과 */
+  .skeleton-shimmer {
+    @apply relative overflow-hidden;
+    background: linear-gradient(
+      90deg,
+      #f5f3f0 0%,
+      #faf9f7 50%,
+      #f5f3f0 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  /* 부드러운 스크롤 스냅 */
+  .snap-x-mandatory {
+    scroll-snap-type: x mandatory;
+  }
+
+  .snap-start {
+    scroll-snap-align: start;
+  }
+
+  /* 텍스트 그라데이션 */
+  .text-gradient-warm {
+    @apply bg-gradient-to-r from-primary-600 via-primary-500 to-accent-500 bg-clip-text text-transparent;
+  }
+
+  /* 호버시 lift 효과 */
+  .hover-lift {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-warm-lg;
+  }
+
+  /* 터치 효과 */
+  .touch-feedback {
+    @apply active:scale-95 transition-transform duration-150;
+  }
+
+  /* 책 표지 효과 */
+  .book-cover {
+    @apply shadow-book transition-all duration-300;
+  }
+
+  .book-cover:hover {
+    @apply shadow-book-hover -translate-y-2 rotate-1;
+  }
+
+  /* 숨김 스크롤바 */
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* 라인 클램프 확장 */
+  .line-clamp-4 {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* Swiper 커스텀 스타일 */
+.swiper-button-prev,
+.swiper-button-next {
+  @apply text-primary-600 !important;
+}
+
+.swiper-pagination-bullet-active {
+  @apply bg-primary-600 !important;
+}
+
+/* React Hot Toast 커스텀 스타일 */
+.toast-custom {
+  @apply bg-white shadow-warm-lg rounded-xl border border-warm-100;
 }

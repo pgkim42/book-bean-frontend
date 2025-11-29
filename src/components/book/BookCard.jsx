@@ -1,13 +1,18 @@
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Heart } from 'lucide-react';
+import { ShoppingCart, Heart, BookOpen } from 'lucide-react';
+import clsx from 'clsx';
 import { formatPrice } from '../../utils/formatters';
 import { BOOK_STATUS } from '../../utils/constants';
 import Button from '../common/Button';
+import Badge, { StatusBadge } from '../common/Badge';
 import useCartStore from '../../store/cartStore';
 import useAuthStore from '../../store/authStore';
 import useWishlistStore from '../../store/wishlistStore';
 import toast from 'react-hot-toast';
 
+/**
+ * Warm & Cozy 스타일 BookCard 컴포넌트
+ */
 const BookCard = ({ book }) => {
   const { addToCart } = useCartStore();
   const { isAuthenticated } = useAuthStore();
@@ -17,6 +22,7 @@ const BookCard = ({ book }) => {
 
   const handleAddToCart = async (e) => {
     e.preventDefault();
+    e.stopPropagation();
 
     if (!isAuthenticated) {
       toast.error('로그인이 필요합니다');
@@ -57,93 +63,120 @@ const BookCard = ({ book }) => {
   };
 
   const isAvailable = book.status === 'AVAILABLE' && book.stockQuantity > 0;
+  const hasDiscount = book.discountRate > 0;
 
   return (
     <Link to={`/books/${book.id}`}>
-      <div className="bg-white rounded-3xl shadow-apple hover:shadow-apple-lg transition-all duration-300 overflow-hidden group">
-        {/* 책 이미지 */}
-        <div className="relative h-72 bg-primary-50 flex items-center justify-center overflow-hidden">
+      <article className="group bg-white rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-300 overflow-hidden hover:-translate-y-1">
+        {/* 책 이미지 영역 */}
+        <div className="relative h-64 bg-gradient-to-br from-warm-100 to-warm-50 flex items-center justify-center overflow-hidden">
           {book.imageUrl ? (
-            <img
-              src={book.imageUrl}
-              alt={book.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            />
+            <div className="relative w-full h-full p-4 flex items-center justify-center">
+              <img
+                src={book.imageUrl}
+                alt={book.title}
+                className="max-h-full max-w-[80%] object-contain book-cover group-hover:scale-105 transition-transform duration-500"
+              />
+            </div>
           ) : (
-            <div className="text-primary-400 text-center p-4">
-              <p className="text-sm">이미지 없음</p>
+            <div className="flex flex-col items-center justify-center text-warm-300">
+              <BookOpen className="w-16 h-16 mb-2" />
+              <span className="text-sm">이미지 없음</span>
             </div>
           )}
 
           {/* 위시리스트 버튼 */}
           <button
             onClick={handleToggleWishlist}
-            className="absolute top-4 left-4 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-apple hover:bg-white transition-all duration-200 group/heart"
+            className={clsx(
+              'absolute top-3 left-3 p-2.5 rounded-full',
+              'bg-white/90 backdrop-blur-sm shadow-warm',
+              'hover:bg-white hover:shadow-warm-lg',
+              'transition-all duration-200',
+              'group/heart'
+            )}
           >
             <Heart
-              className={`w-5 h-5 transition-all duration-200 ${
+              className={clsx(
+                'w-5 h-5 transition-all duration-200',
                 isWishlisted
-                  ? 'fill-red-500 text-red-500'
-                  : 'text-gray-600 group-hover/heart:text-red-500'
-              }`}
+                  ? 'fill-error-500 text-error-500'
+                  : 'text-warm-400 group-hover/heart:text-error-500'
+              )}
             />
           </button>
 
+          {/* 할인율 배지 */}
+          {hasDiscount && (
+            <div className="absolute top-3 right-3">
+              <Badge variant="accent" size="sm">
+                {book.discountRate}% OFF
+              </Badge>
+            </div>
+          )}
+
           {/* 상태 배지 */}
           {book.status !== 'AVAILABLE' && (
-            <div className="absolute top-4 right-4 bg-gray-900 text-white px-4 py-2 rounded-full text-xs font-semibold shadow-apple">
-              {BOOK_STATUS[book.status]}
+            <div className="absolute bottom-3 right-3">
+              <StatusBadge status={book.status} />
             </div>
           )}
 
           {/* 재고 부족 배지 */}
           {book.status === 'AVAILABLE' && book.stockQuantity <= 5 && book.stockQuantity > 0 && (
-            <div className="absolute top-4 right-4 bg-gray-700 text-white px-4 py-2 rounded-full text-xs font-semibold shadow-apple">
-              재고 {book.stockQuantity}권
+            <div className="absolute bottom-3 right-3">
+              <Badge variant="warning" size="sm" dot>
+                재고 {book.stockQuantity}권
+              </Badge>
             </div>
           )}
         </div>
 
-        {/* 책 정보 */}
-        <div className="p-6">
+        {/* 책 정보 영역 */}
+        <div className="p-5">
           {/* 카테고리 */}
-          <p className="text-xs text-primary-500 font-medium mb-2 tracking-wide">
+          <p className="text-xs font-medium text-primary-500 mb-2 tracking-wide uppercase">
             {book.categoryName || '미분류'}
           </p>
 
           {/* 제목 */}
-          <h3 className="text-xl font-semibold text-primary-600 mb-2 line-clamp-2 group-hover:text-primary-700 transition-colors">
+          <h3 className="text-lg font-semibold text-warm-900 mb-1.5 line-clamp-2 group-hover:text-primary-600 transition-colors min-h-[3.5rem]">
             {book.title}
           </h3>
 
           {/* 저자 */}
-          <p className="text-sm text-primary-500 mb-3">{book.author}</p>
+          <p className="text-sm text-warm-500 mb-2">{book.author}</p>
 
-          {/* 출판사 및 출판일 */}
-          <p className="text-xs text-primary-400 mb-4">
-            {book.publisher} · {book.publicationDate}
+          {/* 출판사 */}
+          <p className="text-xs text-warm-400 mb-4">
+            {book.publisher}
           </p>
 
-          {/* 가격 및 장바구니 버튼 */}
-          <div className="flex items-center justify-between mt-4">
+          {/* 가격 영역 */}
+          <div className="flex items-end justify-between pt-4 border-t border-warm-100">
             <div>
-              <span className="text-2xl font-semibold text-primary-600">
+              {hasDiscount && (
+                <p className="text-sm text-warm-400 line-through">
+                  {formatPrice(book.originalPrice)}
+                </p>
+              )}
+              <p className="text-xl font-bold text-primary-600">
                 {formatPrice(book.salePrice)}
-              </span>
+              </p>
             </div>
 
             <Button
               size="sm"
               onClick={handleAddToCart}
               disabled={!isAvailable}
-              className="flex items-center space-x-1"
+              className="flex items-center gap-1.5"
             >
               <ShoppingCart className="w-4 h-4" />
               <span>담기</span>
             </Button>
           </div>
         </div>
-      </div>
+      </article>
     </Link>
   );
 };
