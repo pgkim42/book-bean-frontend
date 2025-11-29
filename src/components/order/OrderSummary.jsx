@@ -1,7 +1,7 @@
 import { formatPrice } from '../../utils/formatters';
 
-const OrderSummary = ({ totalBookPrice, deliveryFee }) => {
-  const totalPaymentAmount = totalBookPrice + deliveryFee;
+const OrderSummary = ({ totalBookPrice, deliveryFee, couponDiscount = 0 }) => {
+  const totalPaymentAmount = totalBookPrice + deliveryFee - couponDiscount;
 
   return (
     <div className="bg-gray-50 rounded-lg p-6">
@@ -18,6 +18,12 @@ const OrderSummary = ({ totalBookPrice, deliveryFee }) => {
             {deliveryFee === 0 ? '무료' : formatPrice(deliveryFee)}
           </span>
         </div>
+        {couponDiscount > 0 && (
+          <div className="flex justify-between text-primary-600">
+            <span>쿠폰 할인</span>
+            <span className="font-medium">-{formatPrice(couponDiscount)}</span>
+          </div>
+        )}
       </div>
 
       <div className="flex justify-between items-center pt-4 border-t">

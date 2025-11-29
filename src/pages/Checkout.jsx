@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import useCartStore from '../store/cartStore';
 import useAuthStore from '../store/authStore';
 import orderService from '../services/orderService';
+import couponService from '../services/couponService';
 import OrderItem from '../components/order/OrderItem';
 import OrderSummary from '../components/order/OrderSummary';
 import Button from '../components/common/Button';
@@ -29,6 +30,12 @@ const Checkout = () => {
   const { items, cartSummary } = useCartStore();
   const [loading, setLoading] = useState(false);
 
+  // 쿠폰 관련 상태
+  const [coupons, setCoupons] = useState([]);
+  const [selectedCouponId, setSelectedCouponId] = useState(null);
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [discountDescription, setDiscountDescription] = useState('');
+
   const {
     register,
     handleSubmit,
@@ -49,6 +56,46 @@ const Checkout = () => {
     }
   }, [items, navigate]);
 
+  // 사용 가능한 쿠폰 목록 로드
+  useEffect(() => {
+    const loadCoupons = async () => {
+      try {
+        const response = await couponService.getMyAvailableCoupons();
+        setCoupons(response.data || []);
+      } catch (error) {
+        console.error('쿠폰 로드 실패:', error);
+      }
+    };
+    loadCoupons();
+  }, []);
+
+  // 쿠폰 선택 핸들러
+  const handleCouponSelect = async (e) => {
+    const couponId = e.target.value;
+
+    if (!couponId) {
+      setSelectedCouponId(null);
+      setCouponDiscount(0);
+      setDiscountDescription('');
+      return;
+    }
+
+    try {
+      const response = await couponService.calculateDiscount(
+        couponId,
+        totalBookPrice,
+        deliveryFee
+      );
+      setSelectedCouponId(couponId);
+      setCouponDiscount(response.data.discountAmount || 0);
+      setDiscountDescription(response.data.discountDescription || '');
+    } catch (error) {
+      toast.error(error.response?.data?.message || '쿠폰 적용에 실패했습니다');
+      setSelectedCouponId(null);
+      setCouponDiscount(0);
+    }
+  };
+
   const onSubmit = async (data) => {
     setLoading(true);
     try {
@@ -68,6 +115,7 @@ const Checkout = () => {
       const orderData = {
         ...data,
         orderItems,
+        userCouponId: selectedCouponId ? Number(selectedCouponId) : null,
       };
 
       const response = await orderService.createOrder(orderData);
@@ -88,6 +136,7 @@ const Checkout = () => {
   const totalBookPrice = cartSummary?.selectedTotalPrice || 0;
   const FREE_SHIPPING_THRESHOLD = 30000;
   const deliveryFee = totalBookPrice >= FREE_SHIPPING_THRESHOLD ? 0 : 3000;
+  const finalPayment = totalBookPrice + deliveryFee - couponDiscount;
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -169,6 +218,36 @@ const Checkout = () => {
               )}
             </div>
 
+            {/* 쿠폰 선택 */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h2 className="text-xl font-bold mb-4">쿠폰 적용</h2>
+              <div className="space-y-4">
+                <select
+                  value={selectedCouponId || ''}
+                  onChange={handleCouponSelect}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
+                >
+                  <option value="">쿠폰 선택 안함</option>
+                  {coupons.map((coupon) => (
+                    <option key={coupon.id} value={coupon.id}>
+                      {coupon.couponName} - {coupon.discountDescription}
+                    </option>
+                  ))}
+                </select>
+                {couponDiscount > 0 && (
+                  <div className="flex justify-between items-center p-3 bg-primary-50 rounded-lg border border-primary-200">
+                    <span className="text-primary-700 font-medium">{discountDescription}</span>
+                    <span className="text-primary-600 font-bold">
+                      -{couponDiscount.toLocaleString()}원
+                    </span>
+                  </div>
+                )}
+                {coupons.length === 0 && (
+                  <p className="text-gray-500 text-sm">사용 가능한 쿠폰이 없습니다</p>
+                )}
+              </div>
+            </div>
+
             {/* 주문 상품 목록 */}
             <div className="bg-white rounded-lg shadow-md p-6">
               <h2 className="text-xl font-bold mb-4">주문 상품</h2>
@@ -196,6 +275,7 @@ const Checkout = () => {
               <OrderSummary
                 totalBookPrice={totalBookPrice}
                 deliveryFee={deliveryFee}
+                couponDiscount={couponDiscount}
               />
               <Button
                 type="submit"
