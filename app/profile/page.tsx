@@ -32,21 +32,27 @@ export default function ProfilePage() {
   const pageSize = 5;
 
   useEffect(() => {
+    if (!authUser) {
+      router.push('/login');
+      return;
+    }
     fetchProfile();
     fetchMyReviews();
-  }, [currentPage]);
+  }, [authUser, currentPage, router]);
 
   const fetchProfile = async () => {
     setLoading(true);
     try {
       const response: any = await userService.getMyInfo();
-      setUser(response.data);
+      // api.ts 인터셉터가 response.data를 반환하므로 직접 사용하거나 fallback
+      const userData = response.data || response;
+      setUser(userData);
       setEditForm({
-        name: response.data.name || '',
-        phone: response.data.phone || '',
-        zipCode: response.data.zipCode || '',
-        address: response.data.address || '',
-        addressDetail: response.data.addressDetail || '',
+        name: userData.name || '',
+        phone: userData.phone || '',
+        zipCode: userData.zipCode || '',
+        address: userData.address || '',
+        addressDetail: userData.addressDetail || '',
       });
     } catch (error) {
       toast.error('프로필 정보를 불러올 수 없습니다');
@@ -97,8 +103,10 @@ export default function ProfilePage() {
         size: pageSize,
         sort: 'createdAt,desc',
       });
-      setReviews(response.data?.content || []);
-      setTotalPages(response.data?.totalPages || 0);
+      // api.ts 인터셉터가 response.data를 반환하므로, response가 곧 ApiResponse
+      const reviewData = response.data || response;
+      setReviews(reviewData?.content || []);
+      setTotalPages(reviewData?.totalPages || 0);
     } catch (error) {
       console.error('리뷰 목록 조회 실패:', error);
     } finally {

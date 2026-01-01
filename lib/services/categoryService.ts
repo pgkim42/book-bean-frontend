@@ -1,30 +1,33 @@
 import api from './api';
 
+interface Category {
+  id: number;
+  name: string;
+}
+
 const categoryService = {
-  // 전체 카테고리 조회
-  getAllCategories: async () => {
-    return await api.get('/categories');
+  /**
+   * 모든 카테고리 조회
+   * 백엔드: GET /api/v1/categories
+   */
+  getAllCategories: async (): Promise<Category[]> => {
+    const response = await api.get('/categories');
+    // api.ts 인터셉터가 response.data를 반환하므로, response가 곧 ApiResponse
+    const data = response.data || response;
+    return Array.isArray(data) ? data : data.content || [];
   },
 
-  // 카테고리 단건 조회
-  getCategory: async (id: number) => {
-    return await api.get(`/categories/${id}`);
+  /**
+   * 카테고리 단건 조회
+   * 백엔드: GET /api/v1/categories/{id}
+   */
+  getCategory: async (categoryId: number): Promise<Category> => {
+    const response = await api.get(`/categories/${categoryId}`);
+    return response.data || response;
   },
 
-  // 카테고리 생성 (관리자)
-  createCategory: async (data: any) => {
-    return await api.post('/categories', data);
-  },
-
-  // 카테고리 수정 (관리자)
-  updateCategory: async (id: number, data: any) => {
-    return await api.put(`/categories/${id}`, data);
-  },
-
-  // 카테고리 삭제 (관리자)
-  deleteCategory: async (id: number) => {
-    return await api.delete(`/categories/${id}`);
-  },
+  // NOTE: 카테고리별 도서 조회는 bookService.getBooksByCategory()를 사용하세요.
+  // 백엔드 엔드포인트: GET /api/v1/books/category/{categoryId}
 };
 
 export default categoryService;

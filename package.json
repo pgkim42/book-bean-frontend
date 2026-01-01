@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:all": "concurrently \"npm run dev\" \"cd ../book-bean && ./gradlew bootRun\" --names \"frontend,backend\" -k",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"

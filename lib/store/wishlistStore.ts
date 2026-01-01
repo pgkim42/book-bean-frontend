@@ -3,28 +3,13 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import api from '../services/api';
-
-// Type definitions
-interface WishlistItem {
-  id: number;
-  bookId: number;
-  title: string;
-  author: string;
-  price: number;
-  imageUrl: string;
-  addedAt: string;
-}
-
-interface WishlistState {
-  wishlist: WishlistItem[];
-  loading: boolean;
-  error: string | null;
-}
+import type { WishlistItem, WishlistState } from '../types';
 
 interface WishlistActions {
   fetchWishlist: () => Promise<void>;
   addToWishlist: (bookId: number) => Promise<boolean>;
   removeFromWishlist: (bookId: number) => Promise<boolean>;
+  toggleWishlist: (bookId: number) => Promise<boolean>;
   isInWishlist: (bookId: number) => boolean;
   clearError: () => void;
 }
@@ -74,6 +59,16 @@ const useWishlistStore = create<WishlistStore>()(
         } catch (error: any) {
           set({ error: error.message });
           return false;
+        }
+      },
+
+      toggleWishlist: async (bookId: number) => {
+        const isInWishlist = get().isInWishlist(bookId);
+
+        if (isInWishlist) {
+          return await get().removeFromWishlist(bookId);
+        } else {
+          return await get().addToWishlist(bookId);
         }
       },
 

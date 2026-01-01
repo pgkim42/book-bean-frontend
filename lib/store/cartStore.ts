@@ -2,23 +2,7 @@
 
 import { create } from 'zustand';
 import api from '../services/api';
-
-// Type definitions
-interface CartItem {
-  id: number;
-  bookId: number;
-  title: string;
-  author: string;
-  price: number;
-  quantity: number;
-  imageUrl: string;
-}
-
-interface CartSummary {
-  items: CartItem[];
-  totalPrice: number;
-  totalItems: number;
-}
+import type { CartItem, CartSummary, CartItemAddRequest } from '../types';
 
 interface CartState {
   cartSummary: CartSummary | null;
@@ -29,7 +13,7 @@ interface CartState {
 
 interface CartActions {
   fetchCart: () => Promise<void>;
-  addToCart: (data: { bookId: number; quantity: number }) => Promise<boolean>;
+  addToCart: (data: CartItemAddRequest) => Promise<boolean>;
   updateCartItem: (itemId: number, quantity: number) => Promise<boolean>;
   removeCartItem: (itemId: number) => Promise<boolean>;
   clearCart: () => Promise<boolean>;
@@ -49,10 +33,13 @@ const useCartStore = create<CartStore>()((set, get) => ({
   fetchCart: async () => {
     set({ loading: true, error: null });
     try {
-      const response: any = await api.get('/cart/my');
+      // 백엔드: GET /api/v1/carts → CartSummaryDto 반환
+      const response: any = await api.get('/carts');
+      // api.ts 인터셉터가 response.data를 반환하므로, response가 곧 ApiResponse
+      const cartData = response.data || response;
       set({
-        cartSummary: response.data,
-        items: response.data?.items || [],
+        cartSummary: cartData,
+        items: cartData?.items || [],
         loading: false,
       });
     } catch (error: any) {
@@ -62,7 +49,8 @@ const useCartStore = create<CartStore>()((set, get) => ({
 
   addToCart: async (data) => {
     try {
-      await api.post('/cart/items', data);
+      // 백엔드: POST /api/v1/carts/items
+      await api.post('/carts/items', data);
       await get().fetchCart();
       return true;
     } catch (error: any) {
@@ -73,7 +61,8 @@ const useCartStore = create<CartStore>()((set, get) => ({
 
   updateCartItem: async (itemId, quantity) => {
     try {
-      await api.put(`/cart/items/${itemId}`, { quantity });
+      // 백엔드: PUT /api/v1/carts/items/{itemId}?quantity={quantity}
+      await api.put(`/carts/items/${itemId}?quantity=${quantity}`);
       await get().fetchCart();
       return true;
     } catch (error: any) {
@@ -84,7 +73,8 @@ const useCartStore = create<CartStore>()((set, get) => ({
 
   removeCartItem: async (itemId) => {
     try {
-      await api.delete(`/cart/items/${itemId}`);
+      // 백엔드: DELETE /api/v1/carts/items/{itemId}
+      await api.delete(`/carts/items/${itemId}`);
       await get().fetchCart();
       return true;
     } catch (error: any) {
@@ -95,7 +85,8 @@ const useCartStore = create<CartStore>()((set, get) => ({
 
   clearCart: async () => {
     try {
-      await api.delete('/cart/clear');
+      // 백엔드: DELETE /api/v1/carts/items (전체 비우기)
+      await api.delete('/carts/items');
       set({ cartSummary: null, items: [] });
       return true;
     } catch (error: any) {

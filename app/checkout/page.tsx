@@ -25,7 +25,7 @@ const checkoutSchema = z.object({
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
   const { items, cartSummary } = useCartStore();
   const [loading, setLoading] = useState(false);
 
@@ -47,11 +47,16 @@ export default function CheckoutPage() {
   });
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      toast.error('로그인이 필요합니다');
+      router.push('/login');
+      return;
+    }
     if (!items || items.length === 0) {
       toast.error('장바구니가 비어있습니다');
       router.push('/cart');
     }
-  }, [items, router]);
+  }, [items, router, isAuthenticated]);
 
   useEffect(() => {
     const loadCoupons = async () => {

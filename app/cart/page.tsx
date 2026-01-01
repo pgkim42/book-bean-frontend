@@ -5,15 +5,21 @@ import { useRouter } from 'next/navigation';
 import { ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 import useCartStore from '@/lib/store/cartStore';
+import useAuthStore from '@/lib/store/authStore';
 import { formatPrice } from '@/lib/utils/formatters';
 
 export default function CartPage() {
   const router = useRouter();
+  const { isAuthenticated } = useAuthStore();
   const { items, cartSummary, loading, fetchCart, updateCartItem, removeCartItem } = useCartStore();
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/login');
+      return;
+    }
     fetchCart();
-  }, [fetchCart]);
+  }, [isAuthenticated, fetchCart, router]);
 
   const handleUpdateQuantity = async (cartItemId: number, quantity: number) => {
     await updateCartItem(cartItemId, quantity);

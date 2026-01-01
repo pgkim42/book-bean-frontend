@@ -2,12 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Package } from 'lucide-react';
 import orderService from '@/lib/services/orderService';
+import useAuthStore from '@/lib/store/authStore';
 import { formatPrice, formatDate } from '@/lib/utils/formatters';
 import { ORDER_STATUS, PAYMENT_STATUS } from '@/lib/utils/constants';
 
 export default function OrdersPage() {
+  const router = useRouter();
+  const { isAuthenticated } = useAuthStore();
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
@@ -15,8 +19,12 @@ export default function OrdersPage() {
   const pageSize = 10;
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/login');
+      return;
+    }
     fetchOrders();
-  }, [currentPage]);
+  }, [isAuthenticated, currentPage, router]);
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -87,20 +95,19 @@ export default function OrdersPage() {
                   </div>
                   <div className="flex flex-col items-end space-y-1">
                     <span
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        order.orderStatus === 'DELIVERED'
-                          ? 'bg-gray-100 text-gray-900'
-                          : order.orderStatus === 'CANCELLED'
+                      className={`px-3 py-1 rounded-full text-sm font-medium ${order.orderStatus === 'DELIVERED'
+                        ? 'bg-gray-100 text-gray-900'
+                        : order.orderStatus === 'CANCELLED'
                           ? 'bg-gray-200 text-gray-900'
                           : order.orderStatus === 'SHIPPED'
-                          ? 'bg-gray-100 text-gray-900'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}
+                            ? 'bg-gray-100 text-gray-900'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}
                     >
-                      {ORDER_STATUS[order.orderStatus]}
+                      {ORDER_STATUS[order.orderStatus as keyof typeof ORDER_STATUS]}
                     </span>
                     <span className="text-xs text-gray-500">
-                      {PAYMENT_STATUS[order.paymentStatus]}
+                      {PAYMENT_STATUS[order.paymentStatus as keyof typeof PAYMENT_STATUS]}
                     </span>
                   </div>
                 </div>
@@ -155,11 +162,10 @@ export default function OrdersPage() {
             <button
               key={i}
               onClick={() => handlePageChange(i)}
-              className={`px-3 py-2 border rounded-lg ${
-                currentPage === i
-                  ? 'bg-primary-600 text-white border-primary-600'
-                  : 'border-gray-300 hover:bg-gray-50'
-              }`}
+              className={`px-3 py-2 border rounded-lg ${currentPage === i
+                ? 'bg-primary-600 text-white border-primary-600'
+                : 'border-gray-300 hover:bg-gray-50'
+                }`}
             >
               {i + 1}
             </button>

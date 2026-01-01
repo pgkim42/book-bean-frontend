@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Heart, ShoppingCart, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import useRouter from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import useWishlistStore from '@/lib/store/wishlistStore';
 import useCartStore from '@/lib/store/cartStore';
 import useAuthStore from '@/lib/store/authStore';
@@ -59,7 +59,7 @@ const BookCard = ({ book }: { book: any }) => (
 
 export default function WishlistPage() {
   const router = useRouter();
-  const { wishlist, clearWishlist, addWishlistToCart, loading: wishlistLoading } = useWishlistStore();
+  const { wishlist, removeFromWishlist, loading: wishlistLoading } = useWishlistStore();
   const { addToCart } = useCartStore();
   const { isAuthenticated } = useAuthStore();
   const [books, setBooks] = useState<any[]>([]);
@@ -78,9 +78,11 @@ export default function WishlistPage() {
 
     setLoading(true);
     try {
-      const bookPromises = wishlist.map((bookId: number) => bookService.getBook(bookId));
+      // wishlist는 WishlistItem[] 타입이므로 bookId를 추출
+      const bookPromises = wishlist.map((item) => bookService.getBook(item.bookId));
       const bookResponses = await Promise.all(bookPromises);
-      const booksData = bookResponses.map((response: any) => response.data);
+      // api.ts 인터셉터가 response.data를 반환하므로 직접 사용
+      const booksData = bookResponses.map((response: any) => response.data || response);
       setBooks(booksData);
     } catch (error) {
       console.error('Failed to fetch wishlist books:', error);
@@ -97,20 +99,26 @@ export default function WishlistPage() {
       return;
     }
 
-    const success = await addWishlistToCart();
-    if (success) {
+    try {
+      // 각 위시리스트 아이템을 장바구니에 추가
+      for (const item of wishlist) {
+        await addToCart({ bookId: item.bookId, quantity: 1 });
+      }
       toast.success('모든 상품이 장바구니에 추가되었습니다');
-    } else {
+    } catch (error) {
       toast.error('장바구니 추가에 실패했습니다');
     }
   };
 
   const handleClearWishlist = async () => {
     if (window.confirm('위시리스트를 전체 삭제하시겠습니까?')) {
-      const success = await clearWishlist();
-      if (success) {
+      try {
+        // 각 아이템을 개별 삭제
+        for (const item of wishlist) {
+          await removeFromWishlist(item.bookId);
+        }
         toast.success('위시리스트가 전체 삭제되었습니다');
-      } else {
+      } catch (error) {
         toast.error('삭제에 실패했습니다');
       }
     }
