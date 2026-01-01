@@ -1,36 +1,234 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Book-Bean Frontend (Next.js)
 
-## Getting Started
+Next.js 16.1.1 기반 온라인 책 쇼핑몰 프론트엔드
 
-First, run the development server:
+Vite + React Router 프로젝트에서 Next.js App Router로 마이그레이션되었습니다.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## 프로젝트 개요
+
+**Book-Bean Frontend**는 최신 React 생태계 기술을 활용한 온라인 책 쇼핑몰 웹 애플리케이션입니다.
+사용자 경험(UX)을 고려한 **Warm & Cozy 디자인 시스템**, **서버 상태 관리**, **폼 유효성 검증** 등 실무에서 필요한 기술들을 학습하고 적용했습니다.
+
+### 주요 구현 사항
+- **Next.js 16.1.1**: App Router, RSC, Server Actions
+- **React 19**: 최신 React 기능 활용
+- **TanStack Query**: 서버 상태 관리 및 캐싱
+- **Zustand**: 클라이언트 상태 관리 (장바구니, 인증, 위시리스트)
+- **React Hook Form + Zod**: 타입 안전한 폼 검증
+- **Tailwind CSS**: Warm & Cozy 커스텀 디자인 시스템
+- **반응형 UI**: 모바일부터 데스크톱까지 완벽 지원
+
+---
+
+## 기술 스택
+
+| 분류 | 기술 | 설명 |
+|------|------|------|
+| **Core** | Next.js 16.1.1, React 19 | App Router, RSC |
+| **Routing** | Next.js App Router | 파일 기반 라우팅 |
+| **Server State** | TanStack Query v5 | 서버 상태 관리, 캐싱 |
+| **Client State** | Zustand v5 | 경량 상태 관리 |
+| **Form** | React Hook Form + Zod | 타입 안전한 폼 검증 |
+| **Styling** | Tailwind CSS 3.4 | 유틸리티 기반 CSS |
+| **UI Components** | Headless UI, Lucide React | 접근성 준수 UI |
+| **Charts** | Recharts | 관리자 대시보드 차트 |
+| **HTTP Client** | Axios | API 통신 |
+| **Toast** | React Hot Toast | 알림 메시지 |
+| **Carousel** | Swiper | 이미지 슬라이더 |
+| **Date** | date-fns | 날짜 처리 |
+
+---
+
+## 주요 기능
+
+### 1. 사용자 기능
+
+#### 📚 책 탐색
+- 카테고리별 필터링
+- 가격대 필터 (Range Slider)
+- 평점 필터
+- 정렬 옵션 (최신순, 인기순, 가격순)
+- 키워드 검색
+- 페이지네이션
+
+#### 🛒 장바구니
+- 장바구니 담기/삭제/수량 변경
+- 전체 선택/개별 선택
+- 실시간 합계 계산
+- Zustand로 상태 관리
+
+#### 📦 주문/결제
+- 배송지 정보 입력 (React Hook Form)
+- 쿠폰 선택 및 할인 적용
+- 결제 수단 선택
+- 주문 내역 조회
+
+#### 🎟️ 쿠폰
+- 사용 가능한 쿠폰 목록 조회
+- 쿠폰 선택 시 할인 금액 미리보기
+- 정액/정률/배송비 무료 쿠폰 지원
+
+#### ⭐ 리뷰
+- 구매 상품 리뷰 작성
+- 별점 (1~5점)
+- 도움됨/도움 안됨 투표
+- 리뷰 정렬 및 필터
+
+### 2. 관리자 기능
+
+#### 📊 대시보드
+- 매출 차트 (Recharts)
+- 주문 현황 차트
+- 인기 도서 순위
+- 신규 가입자 추이
+
+#### 📋 관리 기능
+- 책 관리 (CRUD)
+- 카테고리 관리
+- 주문 관리 (상태 변경)
+- 사용자 관리
+
+---
+
+## 마이그레이션 변경사항
+
+### Vite → Next.js 16.1.1
+
+| 항목 | Vite (React Router) | Next.js (App Router) |
+|------|---------------------|---------------------|
+| 라우팅 | React Router v7 | App Router (파일 기반) |
+| 구조 | `src/pages/` | `app/` |
+| params | `useParams()` | `params` prop (Promise 타입) |
+| 네비게이션 | `useNavigate()` | `useRouter()` |
+| Link | `react-router-dom` | `next/link` |
+| 미들웨어 | 없음 | `proxy.ts` |
+| 스타일 | CSS Modules | Tailwind CSS 전역 |
+
+---
+
+## 프로젝트 구조
+
+```
+book-bean-frontend-nextjs/
+├── app/                      # App Router 페이지
+│   ├── layout.tsx           # 루트 레이아웃
+│   ├── page.tsx             # 메인 페이지
+│   ├── books/               # 책 관련 페이지
+│   ├── cart/                # 장바구니
+│   ├── checkout/            # 주문/결제
+│   ├── orders/              # 주문 내역
+│   ├── profile/             # 프로필
+│   ├── wishlist/            # 위시리스트
+│   ├── admin/               # 관리자 페이지
+│   └── globals.css          # 전역 스타일
+├── components/
+│   ├── common/              # 공통 UI (Button, Input, Card...)
+│   ├── layout/              # 레이아웃 (Header, Footer)
+│   ├── book/                # 책 관련 (BookCard, CategoryFilter)
+│   ├── cart/                # 장바구니 (CartItem, CartSummary)
+│   ├── order/               # 주문 (OrderItem, OrderSummary)
+│   ├── review/              # 리뷰 (ReviewForm, ReviewItem)
+│   ├── filter/              # 필터 (FilterSidebar, PriceRangeSlider)
+│   ├── admin/               # 관리자 모달
+│   └── dashboard/           # 대시보드 차트
+├── lib/
+│   ├── services/            # API 서비스
+│   │   ├── api.ts           # Axios 인스턴스
+│   │   ├── bookService.ts
+│   │   ├── cartService.ts
+│   │   ├── orderService.ts
+│   │   └── ...
+│   ├── store/               # Zustand 스토어
+│   │   ├── authStore.ts
+│   │   ├── cartStore.ts
+│   │   └── wishlistStore.ts
+│   └── utils/               # 유틸리티
+│       ├── formatters.ts    # 가격 포맷팅
+│       └── constants.ts     # 상수 정의
+├── tailwind.config.ts       # Tailwind 설정 (Warm & Cozy)
+├── next.config.ts           # Next.js 설정
+├── proxy.ts                 # 인증 미들웨어
+└── package.json
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 시작하기
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 필수 요구사항
+- Node.js 18+
+- npm 또는 yarn
 
-## Learn More
+### 설치 및 실행
+```bash
+# 의존성 설치
+npm install
 
-To learn more about Next.js, take a look at the following resources:
+# 개발 서버 실행
+npm run dev
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# 프로덕션 빌드
+npm run build
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# 빌드 미리보기
+npm start
+```
 
-## Deploy on Vercel
+### 환경 변수
+```env
+# .env.development
+NEXT_PUBLIC_API_URL=http://localhost:8080/api
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# .env.production
+NEXT_PUBLIC_API_URL=https://api.bookbean.com/api
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 주요 화면
+
+### 사용자 화면
+| 화면 | 설명 |
+|------|------|
+| `/` | 메인 페이지 (배너, 추천 도서) |
+| `/books` | 책 목록 (필터, 정렬, 페이지네이션) |
+| `/books/[id]` | 책 상세 (리뷰, 장바구니 담기) |
+| `/cart` | 장바구니 |
+| `/checkout` | 주문/결제 (쿠폰 적용) |
+| `/orders` | 주문 내역 |
+| `/orders/[id]` | 주문 상세 |
+| `/profile` | 프로필 |
+| `/wishlist` | 위시리스트 |
+
+### 관리자 화면
+| 화면 | 설명 |
+|------|------|
+| `/admin` | 관리자 대시보드 (차트) |
+| `/admin/books` | 책 관리 |
+| `/admin/categories` | 카테고리 관리 |
+| `/admin/orders` | 주문 관리 |
+| `/admin/users` | 사용자 관리 |
+
+---
+
+## UX 개선 사항
+
+### 1. 로딩 상태
+- Skeleton UI로 레이아웃 유지
+- 버튼 로딩 상태 표시
+
+### 2. 에러 처리
+- React Hot Toast로 사용자 친화적 알림
+- API 에러 메시지 표시
+
+### 3. 반응형 디자인
+- 모바일: 1열 그리드
+- 태블릿: 2열 그리드
+- 데스크톱: 3-4열 그리드
+
+### 4. 접근성
+- Headless UI로 키보드 내비게이션
+- 시맨틱 HTML 구조
+- ARIA 속성 적용
