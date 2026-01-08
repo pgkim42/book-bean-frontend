@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, X, Loader2 } from 'lucide-react';
+import { Plus, Edit, Trash2, X, Loader2, Power } from 'lucide-react';
 import toast from 'react-hot-toast';
 import categoryService from '@/lib/services/categoryService';
 import { formatDate } from '@/lib/utils/formatters';
@@ -229,8 +229,8 @@ export default function AdminCategoriesPage() {
   const fetchCategories = async () => {
     setLoading(true);
     try {
-      const response = await categoryService.getAllCategories();
-      setCategories(response.data || []);
+      const categories = await categoryService.getAllCategories();
+      setCategories(categories || []);
     } catch (error) {
       toast.error('카테고리 목록을 불러올 수 없습니다');
       console.error('Error fetching categories:', error);
@@ -271,14 +271,34 @@ export default function AdminCategoriesPage() {
     }
   };
 
-  const handleDelete = async (id: number, name: string) => {
-    if (window.confirm(`"${name}" 카테고리를 삭제하시겠습니까?`)) {
+  // 활성화/비활성화 토글 핸들러
+  const handleToggleActive = async (id: number, name: string, activate: boolean) => {
+    const action = activate ? '활성화' : '비활성화';
+    if (window.confirm(`"${name}" 카테고리를 ${action}하시겠습니까?`)) {
       try {
-        await categoryService.deleteCategory(id);
+        if (activate) {
+          await categoryService.activateCategory(id);
+        } else {
+          await categoryService.deleteCategory(id);
+        }
+        toast.success(`카테고리가 ${action}되었습니다`);
+        fetchCategories();
+      } catch (error: any) {
+        const errorMessage = error.response?.data?.message || error.message || `${action}에 실패했습니다`;
+        toast.error(errorMessage);
+      }
+    }
+  };
+
+  // 진짜 삭제 핸들러
+  const handleHardDelete = async (id: number, name: string) => {
+    if (window.confirm(`"${name}" 카테고리를 완전히 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) {
+      try {
+        await categoryService.hardDeleteCategory(id);
         toast.success('카테고리가 삭제되었습니다');
         fetchCategories();
       } catch (error: any) {
-        const errorMessage = error.response?.data?.message || error.message || '카테고리 삭제에 실패했습니다';
+        const errorMessage = error.response?.data?.message || error.message || '삭제에 실패했습니다';
         toast.error(errorMessage);
       }
     }
@@ -358,21 +378,53 @@ export default function AdminCategoriesPage() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {formatDate(category.createdAt)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2">
+                    {/* 수정 버튼 - 항상 활성화 */}
                     <button
                       onClick={() => handleOpenEditModal(category)}
-                      className="text-amber-600 hover:text-amber-700 mr-4 inline-flex items-center justify-center p-1 rounded hover:bg-amber-100 transition-colors"
+                      className="text-amber-600 hover:text-amber-700 inline-flex items-center justify-center p-1 rounded hover:bg-amber-100 transition-colors"
                       title="수정"
                     >
                       <Edit className="w-4 h-4" />
                     </button>
-                    <button
-                      onClick={() => handleDelete(category.id, category.name)}
-                      className="text-red-600 hover:text-red-700 inline-flex items-center justify-center p-1 rounded hover:bg-red-100 transition-colors"
-                      title="삭제"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+
+                    {/* 활성화/비활성화 토글 버튼 */}
+                    {category.isActive ? (
+                      <button
+                        onClick={() => handleToggleActive(category.id, category.name, false)}
+                        className="text-gray-600 hover:text-gray-700 inline-flex items-center justify-center p-1 rounded hover:bg-gray-100 transition-colors"
+                        title="비활성화"
+                      >
+                        <Power className="w-4 h-4" />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleToggleActive(category.id, category.name, true)}
+                        className="text-green-600 hover:text-green-700 inline-flex items-center justify-center p-1 rounded hover:bg-green-100 transition-colors"
+                        title="활성화"
+                      >
+                        <Power className="w-4 h-4" />
+                      </button>
+                    )}
+
+                    {/* 진짜 삭제 버튼 - 비활성화 상태일 때만 활성화 */}
+                    {!category.isActive ? (
+                      <button
+                        onClick={() => handleHardDelete(category.id, category.name)}
+                        className="text-red-600 hover:text-red-700 inline-flex items-center justify-center p-1 rounded hover:bg-red-100 transition-colors"
+                        title="삭제"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    ) : (
+                      <button
+                        disabled
+                        className="text-gray-300 inline-flex items-center justify-center p-1 rounded cursor-not-allowed"
+                        title="비활성화 후 삭제 가능"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
