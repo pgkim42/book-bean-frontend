@@ -5,6 +5,7 @@ import type { User, LoginCredentials, RegisterData } from '../types';
 
 const AUTH_TOKEN_KEY = 'auth_token';
 const AUTH_USER_KEY = 'auth_user';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
 
 interface AuthState {
   user: User | null;
@@ -64,7 +65,7 @@ const useAuthStore = create<AuthStore>()((set) => ({
     set({ loading: true, error: null });
     try {
       // 직접 fetch 사용 (api.ts 인터셉터 우회)
-      const res = await fetch('http://localhost:8080/api/v1/auth/login', {
+      const res = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials),
@@ -96,7 +97,7 @@ const useAuthStore = create<AuthStore>()((set) => ({
   register: async (data) => {
     set({ loading: true, error: null });
     try {
-      const res = await fetch('http://localhost:8080/api/v1/auth/register', {
+      const res = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),

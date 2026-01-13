@@ -6,53 +6,13 @@ import toast from 'react-hot-toast';
 import userService from '@/lib/services/userService';
 import useAuthStore from '@/lib/store/authStore';
 import { formatDate } from '@/lib/utils/formatters';
+import Button from '@/components/common/Button';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 const VIEW_MODES = {
   CARD: 'card',
   TABLE: 'table',
   COMPACT: 'compact',
-};
-
-// Simple Button component
-const Button = ({
-  children,
-  onClick,
-  type = 'button',
-  variant = 'primary',
-  size = 'md',
-  disabled = false,
-  className = '',
-}: {
-  children: React.ReactNode;
-  onClick?: () => void;
-  type?: 'button' | 'submit';
-  variant?: 'primary' | 'outline';
-  size?: 'sm' | 'md';
-  disabled?: boolean;
-  className?: string;
-}) => {
-  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2';
-
-  const variantClasses = {
-    primary: 'bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500',
-    outline: 'border border-gray-400 text-gray-900 hover:bg-gray-100 focus:ring-gray-500',
-  };
-
-  const sizeClasses = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-sm',
-  };
-
-  return (
-    <button
-      type={type}
-      onClick={onClick}
-      disabled={disabled}
-      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}
-    >
-      {children}
-    </button>
-  );
 };
 
 // Pagination component
@@ -112,13 +72,6 @@ const Pagination = ({
     </div>
   );
 };
-
-// Loading component
-const Loading = () => (
-  <div className="flex justify-center items-center min-h-screen">
-    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-  </div>
-);
 
 export default function AdminUsersPage() {
   const { user: authUser } = useAuthStore();
@@ -383,7 +336,7 @@ export default function AdminUsersPage() {
   );
 
   if (loading) {
-    return <Loading />;
+    return <LoadingSpinner fullPage />;
   }
 
   return (

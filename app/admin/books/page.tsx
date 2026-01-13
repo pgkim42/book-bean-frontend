@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, X, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Edit, Trash2, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,17 +11,19 @@ import categoryService from '@/lib/services/categoryService';
 import { formatPrice, formatDate } from '@/lib/utils/formatters';
 import { BOOK_STATUS } from '@/lib/utils/constants';
 import { clsx } from 'clsx';
+import Button from '@/components/common/Button';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 // BookRequestDto 기반 Validation Schema
 const bookSchema = z.object({
-  categoryId: z.number({ required_error: '카테고리는 필수입니다' }),
+  categoryId: z.number({ message: '카테고리는 필수입니다' }),
   isbn: z.string().max(20, 'ISBN은 20자 이하여야 합니다').optional().or(z.literal('')),
   title: z.string().min(1, '제목은 필수입니다').max(200, '제목은 200자 이하여야 합니다'),
   author: z.string().min(1, '저자는 필수입니다').max(100, '저자는 100자 이하여야 합니다'),
   publisher: z.string().max(100, '출판사는 100자 이하여야 합니다').optional().or(z.literal('')),
   publicationDate: z.string().optional().or(z.literal('')),
-  originalPrice: z.number({ required_error: '정가는 필수입니다' }).min(0, '정가는 0원 이상이어야 합니다'),
-  salePrice: z.number({ required_error: '판매가는 필수입니다' }).min(0, '판매가는 0원 이상이어야 합니다'),
+  originalPrice: z.number({ message: '정가는 필수입니다' }).min(0, '정가는 0원 이상이어야 합니다'),
+  salePrice: z.number({ message: '판매가는 필수입니다' }).min(0, '판매가는 0원 이상이어야 합니다'),
   discountRate: z.number().min(0, '할인율은 0 이상이어야 합니다').max(100, '할인율은 100 이하여야 합니다').optional(),
   stockQuantity: z.number().min(0, '재고 수량은 0 이상이어야 합니다').optional(),
   description: z.string().optional().or(z.literal('')),
@@ -52,131 +54,6 @@ type Book = {
 type Category = {
   id: number;
   name: string;
-};
-
-// Button Component
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'accent' | 'destructive';
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-  loading?: boolean;
-  fullWidth?: boolean;
-}
-
-const Button = ({
-  children,
-  variant = 'primary',
-  size = 'md',
-  disabled = false,
-  loading = false,
-  fullWidth = false,
-  className = '',
-  ...props
-}: ButtonProps) => {
-  const baseStyles = clsx(
-    'inline-flex items-center justify-center font-medium',
-    'rounded-xl transition-all duration-200',
-    'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-    'disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none',
-    'hover:scale-[1.02] active:scale-[0.98]',
-    'disabled:hover:scale-100'
-  );
-
-  const variants = {
-    primary: clsx(
-      'bg-primary-600 text-white',
-      'hover:bg-primary-700',
-      'focus-visible:ring-primary-500',
-      'shadow-warm hover:shadow-warm-lg'
-    ),
-    secondary: clsx(
-      'bg-primary-50 text-primary-700',
-      'hover:bg-primary-100',
-      'focus-visible:ring-primary-500',
-      'border border-primary-200',
-      'shadow-warm-sm hover:shadow-warm'
-    ),
-    outline: clsx(
-      'border-2 border-primary-500 text-primary-600',
-      'hover:bg-primary-500 hover:text-white',
-      'focus-visible:ring-primary-500',
-      'bg-transparent'
-    ),
-    ghost: clsx(
-      'text-primary-600 bg-transparent',
-      'hover:bg-primary-50',
-      'focus-visible:ring-primary-500'
-    ),
-    accent: clsx(
-      'bg-accent-500 text-white',
-      'hover:bg-accent-600',
-      'focus-visible:ring-accent-500',
-      'shadow-warm hover:shadow-warm-lg'
-    ),
-    destructive: clsx(
-      'bg-error-500 text-white',
-      'hover:bg-error-600',
-      'focus-visible:ring-error-500',
-      'shadow-warm hover:shadow-warm-lg'
-    ),
-  };
-
-  const sizes = {
-    xs: 'px-3 py-1.5 text-xs gap-1.5',
-    sm: 'px-4 py-2 text-sm gap-2',
-    md: 'px-5 py-2.5 text-base gap-2',
-    lg: 'px-6 py-3 text-lg gap-2.5',
-    xl: 'px-8 py-4 text-xl gap-3',
-  };
-
-  return (
-    <button
-      className={clsx(
-        baseStyles,
-        variants[variant],
-        sizes[size],
-        fullWidth && 'w-full',
-        className
-      )}
-      disabled={disabled || loading}
-      {...props}
-    >
-      {loading && (
-        <svg
-          className="w-4 h-4 animate-spin"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            className="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="4"
-          />
-          <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-          />
-        </svg>
-      )}
-      {children}
-    </button>
-  );
-};
-
-// Loading Component
-const Loading = () => {
-  return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="text-center">
-        <Loader2 className="w-12 h-12 mx-auto animate-spin text-primary-600" />
-        <p className="mt-4 text-gray-600">로딩 중...</p>
-      </div>
-    </div>
-  );
 };
 
 // Pagination Component
@@ -346,14 +223,14 @@ const BookFormModal = ({ isOpen, onClose, onSubmit, initialData, categories }: B
 
   const onSubmitForm = async (data: BookFormData) => {
     try {
-      // 빈 문자열을 null로 변환
-      const processedData = {
+      // 빈 문자열을 undefined로 변환 (BookFormData 타입 호환)
+      const processedData: BookFormData = {
         ...data,
-        isbn: data.isbn || null,
-        publisher: data.publisher || null,
-        publicationDate: data.publicationDate || null,
-        description: data.description || null,
-        coverImageUrl: data.coverImageUrl || null,
+        isbn: data.isbn || undefined,
+        publisher: data.publisher || undefined,
+        publicationDate: data.publicationDate || undefined,
+        description: data.description || undefined,
+        coverImageUrl: data.coverImageUrl || undefined,
         discountRate: data.discountRate || 0,
         stockQuantity: data.stockQuantity || 0,
         pages: data.pages || 0,
@@ -580,7 +457,7 @@ const BookFormModal = ({ isOpen, onClose, onSubmit, initialData, categories }: B
                   <label className="block text-sm font-medium text-gray-700 mb-1">설명</label>
                   <textarea
                     {...register('description')}
-                    rows="4"
+                    rows={4}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                   {errors.description && (
@@ -630,8 +507,10 @@ export default function AdminBooksPage() {
         size: pageSize,
         sort: 'createdAt,desc',
       });
-      setBooks(response.data.content || []);
-      setTotalPages(response.data.totalPages || 0);
+      // API 응답 구조: api.ts 인터셉터가 response.data를 반환하므로 response가 곧 data
+      const pageData = (response as any)?.data || response;
+      setBooks(pageData?.content || []);
+      setTotalPages(pageData?.totalPages || 0);
     } catch (error) {
       toast.error('도서 목록을 불러올 수 없습니다');
     } finally {
@@ -642,7 +521,8 @@ export default function AdminBooksPage() {
   const fetchCategories = async () => {
     try {
       const response = await categoryService.getAllCategories();
-      setCategories(response.data || []);
+      const categoryData = (response as any)?.data || response;
+      setCategories(categoryData || []);
     } catch (error) {
       toast.error('카테고리 목록을 불러올 수 없습니다');
     }
@@ -692,7 +572,7 @@ export default function AdminBooksPage() {
   };
 
   if (loading) {
-    return <Loading />;
+    return <LoadingSpinner fullPage />;
   }
 
   return (

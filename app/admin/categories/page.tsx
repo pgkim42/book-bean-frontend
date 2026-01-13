@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, X, Loader2, Power } from 'lucide-react';
+import { Plus, Edit, Trash2, X, Power } from 'lucide-react';
 import toast from 'react-hot-toast';
 import categoryService from '@/lib/services/categoryService';
 import { formatDate } from '@/lib/utils/formatters';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 // Category type definition
 interface Category {
@@ -20,7 +21,7 @@ interface Category {
 // Validation schema types
 interface CategoryFormData {
   name: string;
-  description: string;
+  description?: string;  // optional to allow empty
   displayOrder: number;
 }
 
@@ -83,8 +84,9 @@ const CategoryFormModal = ({ isOpen, onClose, onSubmit, initialData }: CategoryF
     setIsSubmitting(true);
     try {
       const processedData: CategoryFormData = {
-        ...formData,
-        description: formData.description.trim() || null,
+        name: formData.name.trim(),
+        description: formData.description.trim() || undefined,
+        displayOrder: formData.displayOrder,
       };
       await onSubmit(processedData);
       onClose();
@@ -151,7 +153,7 @@ const CategoryFormModal = ({ isOpen, onClose, onSubmit, initialData }: CategoryF
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows="3"
+                  rows={3}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
                 />
               </div>
@@ -203,18 +205,6 @@ const CategoryFormModal = ({ isOpen, onClose, onSubmit, initialData }: CategoryF
   );
 };
 
-// Loading Component (Inline)
-const Loading = () => {
-  return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="text-center">
-        <Loader2 className="w-12 h-12 mx-auto animate-spin text-amber-600" />
-        <p className="mt-4 text-gray-600">로딩 중...</p>
-      </div>
-    </div>
-  );
-};
-
 // Main Admin Categories Page
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -229,8 +219,10 @@ export default function AdminCategoriesPage() {
   const fetchCategories = async () => {
     setLoading(true);
     try {
-      const categories = await categoryService.getAllCategories();
-      setCategories(categories || []);
+      const response = await categoryService.getAllCategories();
+      // API 응답 구조 맞추기: Category 타입 호환
+      const categoryList = (response as Category[]) || [];
+      setCategories(categoryList);
     } catch (error) {
       toast.error('카테고리 목록을 불러올 수 없습니다');
       console.error('Error fetching categories:', error);
@@ -305,7 +297,7 @@ export default function AdminCategoriesPage() {
   };
 
   if (loading) {
-    return <Loading />;
+    return <LoadingSpinner fullPage />;
   }
 
   return (

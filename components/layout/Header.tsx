@@ -17,66 +17,8 @@ import clsx from 'clsx';
 import useAuthStore from '@/lib/store/authStore';
 import useCartStore from '@/lib/store/cartStore';
 import useWishlistStore from '@/lib/store/wishlistStore';
-
-// Button 컴포넌트 (임시)
-const Button = ({
-  children,
-  variant = 'primary',
-  size = 'md',
-  className = '',
-  onClick,
-}: {
-  children: React.ReactNode;
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
-  className?: string;
-  onClick?: () => void;
-}) => {
-  const baseStyles = 'inline-flex items-center justify-center rounded-xl font-medium transition-all duration-200';
-
-  const variants = {
-    primary: 'bg-primary-600 text-white hover:bg-primary-700 shadow-warm hover:shadow-warm-md',
-    secondary: 'bg-warm-100 text-warm-800 hover:bg-warm-200',
-    outline: 'border-2 border-warm-200 text-warm-700 hover:border-primary-600 hover:text-primary-600',
-    ghost: 'text-warm-600 hover:text-primary-600 hover:bg-primary-50',
-  };
-
-  const sizes = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-base',
-    lg: 'px-6 py-3 text-lg',
-  };
-
-  return (
-    <button
-      onClick={onClick}
-      className={clsx(baseStyles, variants[variant], sizes[size], className)}
-    >
-      {children}
-    </button>
-  );
-};
-
-// Badge 컴포넌트 (임시)
-const CountBadge = ({ count, variant }: { count: number; variant: 'primary' | 'error' }) => {
-  const colors = {
-    primary: 'bg-primary-600 text-white',
-    error: 'bg-error-500 text-white',
-  };
-
-  return (
-    <span
-      className={clsx(
-        'absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px]',
-        'flex items-center justify-center',
-        'text-[10px] font-bold rounded-full',
-        colors[variant]
-      )}
-    >
-      {count > 9 ? '9+' : count}
-    </span>
-  );
-};
+import Button from '@/components/common/Button';
+import Badge from '@/components/common/Badge';
 
 const Header = () => {
   const router = useRouter();
@@ -150,7 +92,7 @@ const Header = () => {
                   <Heart className="w-5 h-5" />
                   {wishlistCount > 0 && (
                     <span className="absolute -top-0.5 -right-0.5">
-                      <CountBadge count={wishlistCount} variant="error" />
+                      <Badge count={wishlistCount} variant="error" />
                     </span>
                   )}
                 </Link>
@@ -163,7 +105,7 @@ const Header = () => {
                   <ShoppingCart className="w-5 h-5" />
                   {cartItemCount > 0 && (
                     <span className="absolute -top-0.5 -right-0.5">
-                      <CountBadge count={cartItemCount} variant="primary" />
+                      <Badge count={cartItemCount} variant="primary" />
                     </span>
                   )}
                 </Link>
@@ -251,7 +193,7 @@ const Header = () => {
                     위시리스트
                   </span>
                   {wishlistCount > 0 && (
-                    <CountBadge count={wishlistCount} variant="error" />
+                    <Badge count={wishlistCount} variant="error" />
                   )}
                 </Link>
 
@@ -265,7 +207,7 @@ const Header = () => {
                     장바구니
                   </span>
                   {cartItemCount > 0 && (
-                    <CountBadge count={cartItemCount} variant="primary" />
+                    <Badge count={cartItemCount} variant="primary" />
                   )}
                 </Link>
 

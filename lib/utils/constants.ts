@@ -14,7 +14,7 @@ export const USER_ROLES = {
 };
 
 // Order Status
-export const ORDER_STATUS = {
+export const ORDER_STATUS: Record<string, string> = {
   PENDING: '주문 대기',
   PAID: '결제 완료',
   SHIPPED: '배송 중',
@@ -23,7 +23,7 @@ export const ORDER_STATUS = {
 };
 
 // Payment Method
-export const PAYMENT_METHOD = {
+export const PAYMENT_METHOD: Record<string, string> = {
   CARD: '신용카드',
   BANK_TRANSFER: '계좌이체',
   VIRTUAL_ACCOUNT: '가상계좌',
@@ -31,7 +31,7 @@ export const PAYMENT_METHOD = {
 };
 
 // Payment Status
-export const PAYMENT_STATUS = {
+export const PAYMENT_STATUS: Record<string, string> = {
   PENDING: '결제 대기',
   COMPLETED: '결제 완료',
   FAILED: '결제 실패',
@@ -39,7 +39,7 @@ export const PAYMENT_STATUS = {
 };
 
 // Book Status
-export const BOOK_STATUS = {
+export const BOOK_STATUS: Record<string, string> = {
   AVAILABLE: '판매중',
   OUT_OF_STOCK: '품절',
   DISCONTINUED: '절판',
@@ -48,3 +48,4 @@ export const BOOK_STATUS = {
 // Pagination
 export const DEFAULT_PAGE_SIZE = 10;
 export const PAGE_SIZE_OPTIONS = [10, 20, 30, 50];
+

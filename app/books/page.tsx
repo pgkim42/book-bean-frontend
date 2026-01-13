@@ -185,12 +185,12 @@ export default function BooksPage() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold mb-2">도서 목록</h1>
-              <p className="text-gray-600">다양한 책을 만나보세요</p>
+              <p className="text-warm-600">다양한 책을 만나보세요</p>
             </div>
             <div className="flex gap-2">
               <button
                 onClick={() => setShowMobileFilter(true)}
-                className="lg:hidden flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg"
+                className="lg:hidden flex items-center gap-2 px-4 py-2 border border-warm-300 rounded-xl hover:border-primary-500 transition-colors"
               >
                 <Filter className="w-4 h-4" />
                 필터
@@ -214,13 +214,14 @@ export default function BooksPage() {
           />
 
           {error && (
-            <div className="bg-gray-100 border border-gray-300 text-gray-900 px-4 py-3 rounded-lg">
+            <div className="bg-error-50 border border-error-200 text-error-600 px-4 py-3 rounded-xl flex items-center gap-2">
+              <span>⚠️</span>
               {error}
             </div>
           )}
 
           {searchKeyword && (
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-warm-600">
               "{searchKeyword}" 검색 결과: {books.length}권
             </div>
           )}
@@ -233,7 +234,7 @@ export default function BooksPage() {
             </div>
           ) : books.length === 0 ? (
             <div className="text-center py-16">
-              <p className="text-gray-500 text-lg">도서가 없습니다</p>
+              <p className="text-warm-500 text-lg">도서가 없습니다</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
