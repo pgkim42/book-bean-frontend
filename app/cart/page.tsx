@@ -7,6 +7,7 @@ import Link from 'next/link';
 import useCartStore from '@/lib/store/cartStore';
 import useAuthStore from '@/lib/store/authStore';
 import { formatPrice } from '@/lib/utils/formatters';
+import type { CartItem } from '@/lib/types';
 
 export default function CartPage() {
   const router = useRouter();
@@ -68,7 +69,7 @@ export default function CartPage() {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-4">
-            {items.map((item: any) => (
+            {items.map((item: CartItem) => (
               <div key={item.id} className="bg-white rounded-lg shadow-md p-4 flex gap-4">
                 {item.bookCoverImageUrl ? (
                   <img

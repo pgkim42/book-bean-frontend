@@ -9,6 +9,7 @@ import useCartStore from '@/lib/store/cartStore';
 import useAuthStore from '@/lib/store/authStore';
 import bookService from '@/lib/services/bookService';
 import { formatPrice } from '@/lib/utils/formatters';
+import type { Book } from '@/lib/types';
 
 // 임시 BookCard 컴포넌트
 const BookCardSkeleton = () => (
@@ -19,7 +20,7 @@ const BookCardSkeleton = () => (
   </div>
 );
 
-const BookCard = ({ book }: { book: any }) => (
+const BookCard = ({ book }: { book: Book }) => (
   <a
     href={`/books/${book.id}`}
     className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden group"
@@ -62,7 +63,7 @@ export default function WishlistPage() {
   const { wishlist, removeFromWishlist, loading: wishlistLoading } = useWishlistStore();
   const { addToCart } = useCartStore();
   const { isAuthenticated } = useAuthStore();
-  const [books, setBooks] = useState<any[]>([]);
+  const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -82,7 +83,7 @@ export default function WishlistPage() {
       const bookPromises = wishlist.map((item) => bookService.getBook(item.bookId));
       const bookResponses = await Promise.all(bookPromises);
       // api.ts 인터셉터가 response.data를 반환하므로 직접 사용
-      const booksData = bookResponses.map((response: any) => response.data || response);
+      const booksData = bookResponses.map((response) => response.data || response);
       setBooks(booksData);
     } catch (error) {
       console.error('Failed to fetch wishlist books:', error);

@@ -9,17 +9,18 @@ import userService from '@/lib/services/userService';
 import reviewService from '@/lib/services/reviewService';
 import useAuthStore from '@/lib/store/authStore';
 import { formatDate } from '@/lib/utils/formatters';
+import type { User, Review, ReviewUpdateRequest, PaginatedResponse } from '@/lib/types';
 
 export default function ProfilePage() {
   const router = useRouter();
   const { user: authUser, logout } = useAuthStore();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<(User & { id?: number }) | null>(null);
   const [loading, setLoading] = useState(true);
-  const [reviews, setReviews] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [editingReview, setEditingReview] = useState<any>(null);
+  const [editingReview, setEditingReview] = useState<Review | null>(null);
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({
@@ -43,7 +44,7 @@ export default function ProfilePage() {
   const fetchProfile = async () => {
     setLoading(true);
     try {
-      const response: any = await userService.getMyInfo();
+      const response = await userService.getMyInfo();
       // api.ts 인터셉터가 response.data를 반환하므로 직접 사용하거나 fallback
       const userData = response.data || response;
       setUser(userData);
@@ -90,15 +91,16 @@ export default function ProfilePage() {
       toast.success('프로필이 수정되었습니다');
       setIsEditing(false);
       fetchProfile();
-    } catch (error: any) {
-      toast.error(error.message || '프로필 수정에 실패했습니다');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '프로필 수정에 실패했습니다';
+      toast.error(message);
     }
   };
 
   const fetchMyReviews = async () => {
     setReviewsLoading(true);
     try {
-      const response: any = await reviewService.getMyReviews({
+      const response = await reviewService.getMyReviews({
         page: currentPage,
         size: pageSize,
         sort: 'createdAt,desc',
@@ -114,20 +116,21 @@ export default function ProfilePage() {
     }
   };
 
-  const handleEditReview = (review: any) => {
+  const handleEditReview = (review: Review) => {
     setEditingReview(review);
     setShowReviewForm(true);
   };
 
-  const handleReviewSubmit = async (data: any) => {
+  const handleReviewSubmit = async (data: ReviewUpdateRequest) => {
     try {
       await reviewService.updateReview(editingReview.id, data);
       toast.success('리뷰가 수정되었습니다');
       setShowReviewForm(false);
       setEditingReview(null);
       fetchMyReviews();
-    } catch (error: any) {
-      toast.error(error.message || '리뷰 수정에 실패했습니다');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '리뷰 수정에 실패했습니다';
+      toast.error(message);
       throw error;
     }
   };
@@ -138,8 +141,9 @@ export default function ProfilePage() {
         await reviewService.deleteReview(reviewId);
         toast.success('리뷰가 삭제되었습니다');
         fetchMyReviews();
-      } catch (error: any) {
-        toast.error(error.message || '리뷰 삭제에 실패했습니다');
+      } catch (error) {
+        const message = error instanceof Error ? error.message : '리뷰 삭제에 실패했습니다';
+        toast.error(message);
       }
     }
   };
@@ -163,8 +167,9 @@ export default function ProfilePage() {
         toast.success('회원 탈퇴가 완료되었습니다');
         logout();
         router.push('/');
-      } catch (error: any) {
-        toast.error(error.message || '회원 탈퇴에 실패했습니다');
+      } catch (error) {
+        const message = error instanceof Error ? error.message : '회원 탈퇴에 실패했습니다';
+        toast.error(message);
       }
     }
   };

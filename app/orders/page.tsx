@@ -8,11 +8,12 @@ import orderService from '@/lib/services/orderService';
 import useAuthStore from '@/lib/store/authStore';
 import { formatPrice, formatDate } from '@/lib/utils/formatters';
 import { ORDER_STATUS, PAYMENT_STATUS } from '@/lib/utils/constants';
+import type { Order } from '@/lib/types';
 
 export default function OrdersPage() {
   const router = useRouter();
   const { isAuthenticated } = useAuthStore();
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -29,7 +30,7 @@ export default function OrdersPage() {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response: any = await orderService.getMyOrders({
+      const response = await orderService.getMyOrders({
         page: currentPage,
         size: pageSize,
         sort: 'createdAt,desc',

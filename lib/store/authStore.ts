@@ -88,8 +88,9 @@ const useAuthStore = create<AuthStore>()((set) => ({
 
       set({ user, isAuthenticated: true, loading: false });
       return true;
-    } catch (error: any) {
-      set({ error: error.message || '로그인 실패', loading: false });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '로그인 실패';
+      set({ error: message, loading: false });
       return false;
     }
   },
@@ -110,8 +111,9 @@ const useAuthStore = create<AuthStore>()((set) => ({
 
       set({ loading: false });
       return true;
-    } catch (error: any) {
-      set({ error: error.message, loading: false });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '회원가입 실패';
+      set({ error: message, loading: false });
       return false;
     }
   },

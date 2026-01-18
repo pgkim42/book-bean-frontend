@@ -1,256 +1,85 @@
-'use client';
+import { fetchBooks } from '@/lib/utils/server-fetch';
+import BookListClient from './components/BookListClient';
 
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { Filter } from 'lucide-react';
-import bookService from '@/lib/services/bookService';
-import type { Book } from '@/lib/types';
-
-// Components
-import BookCard from '@/components/book/BookCard';
-import BookCardSkeleton from '@/components/book/BookCardSkeleton';
-import BookSearchBar from '@/components/book/BookSearchBar';
-import SortDropdown from '@/components/filter/SortDropdown';
-import CategoryFilter from '@/components/filter/CategoryFilter';
-import FilterSidebar from '@/components/filter/FilterSidebar';
-import FilterTags from '@/components/filter/FilterTags';
-import Pagination from '@/components/filter/Pagination';
-
-interface PriceRange {
-  min: number;
-  max: number;
+interface BooksPageProps {
+  searchParams: Promise<{
+    [key: string]: string | string[] | undefined;
+  }>;
 }
 
-// Books Page
-export default function BooksPage() {
-  const searchParams = useSearchParams();
-  const [books, setBooks] = useState<Book[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [showMobileFilter, setShowMobileFilter] = useState(false);
+/**
+ * 도서 목록 페이지 (서버 컴포넌트)
+ * - URL 파라미터를 기반으로 초기 데이터를 서버에서 페칭
+ * - 인터랙티브한 부분은 클라이언트 컴포넌트로 위임
+ */
+export default async function BooksPage({ searchParams }: BooksPageProps) {
+  const params = await searchParams;
 
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(
-    searchParams.get('category') ? parseInt(searchParams.get('category')!) : null
-  );
-  const [searchKeyword, setSearchKeyword] = useState(searchParams.get('search') || '');
-  const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'createdAt,desc');
-  const [priceRange, setPriceRange] = useState<PriceRange>({
-    min: searchParams.get('minPrice') ? parseInt(searchParams.get('minPrice')!) : 0,
-    max: searchParams.get('maxPrice') ? parseInt(searchParams.get('maxPrice')!) : 100000,
-  });
-  const [minRating, setMinRating] = useState<number | null>(
-    searchParams.get('minRating') ? parseFloat(searchParams.get('minRating')!) : null
-  );
+  // URL 파라미터 파싱
+  const page = params.page ? parseInt(params.page as string) : 0;
+  const size = 12;
+  const sort = (params.sort as string) || 'createdAt,desc';
+  const minPrice = params.minPrice ? parseInt(params.minPrice as string) : undefined;
+  const maxPrice = params.maxPrice ? parseInt(params.maxPrice as string) : undefined;
+  const minRating = params.minRating ? parseFloat(params.minRating as string) : undefined;
+  const category = params.category ? parseInt(params.category as string) : undefined;
+  const keyword = params.search as string;
 
-  const [currentPage, setCurrentPage] = useState(
-    searchParams.get('page') ? parseInt(searchParams.get('page')!) : 0
-  );
-  const [totalPages, setTotalPages] = useState(0);
-  const pageSize = 12;
+  // 서버에서 초기 데이터 페칭
+  let initialBooks: any[] = [];
+  let initialTotalPages = 0;
 
-  useEffect(() => {
-    fetchBooks();
-    updateURL();
-  }, [selectedCategory, searchKeyword, currentPage, sortBy, priceRange, minRating]);
-
-  const updateURL = () => {
-    const params = new URLSearchParams();
-    if (selectedCategory) params.set('category', selectedCategory.toString());
-    if (searchKeyword) params.set('search', searchKeyword);
-    if (currentPage > 0) params.set('page', currentPage.toString());
-    if (sortBy !== 'createdAt,desc') params.set('sort', sortBy);
-    if (priceRange.min > 0) params.set('minPrice', priceRange.min.toString());
-    if (priceRange.max < 100000) params.set('maxPrice', priceRange.max.toString());
-    if (minRating !== null) params.set('minRating', minRating.toString());
-
-    const queryString = params.toString();
-    const newUrl = queryString ? `/books?${queryString}` : '/books';
-    window.history.replaceState(null, '', newUrl);
-  };
-
-  const fetchBooks = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const params = {
-        page: currentPage,
-        size: pageSize,
-        sort: sortBy,
-      };
-
-      if (priceRange.min > 0) (params as any).minPrice = priceRange.min;
-      if (priceRange.max < 100000) (params as any).maxPrice = priceRange.max;
-      if (minRating !== null) (params as any).minRating = minRating;
-
-      let response: any;
-      if (searchKeyword) {
-        response = await bookService.searchBooks(searchKeyword, params);
-      } else if (selectedCategory) {
-        response = await bookService.getBooksByCategory(selectedCategory, params);
-      } else {
-        response = await bookService.getAllBooks(params);
-      }
-
-      // API 응답: { success, data: PageResponse, message }
-      // api.ts 인터셉터가 response.data를 반환하므로 response가 곧 ApiResponse
-      const pageData = response?.data || response;
-      setBooks(pageData?.content || []);
-      setTotalPages(pageData?.totalPages || 0);
-    } catch (err: any) {
-      console.error('도서 목록 조회 실패:', err);
-      setError(err.message || '도서 목록을 불러오는데 실패했습니다');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCategoryChange = (categoryId: number | null) => {
-    setSelectedCategory(categoryId);
-    setSearchKeyword('');
-    setCurrentPage(0);
-  };
-
-  const handleSearch = (keyword: string) => {
-    setSearchKeyword(keyword);
-    setSelectedCategory(null);
-    setCurrentPage(0);
-  };
-
-  const handleSortChange = (newSort: string) => {
-    setSortBy(newSort);
-    setCurrentPage(0);
-  };
-
-  const handlePriceRangeChange = (newRange: PriceRange) => {
-    setPriceRange(newRange);
-    setCurrentPage(0);
-  };
-
-  const handleMinRatingChange = (rating: number | null) => {
-    setMinRating(rating);
-    setCurrentPage(0);
-  };
-
-  const handleResetFilters = () => {
-    setPriceRange({ min: 0, max: 100000 });
-    setMinRating(null);
-    setCurrentPage(0);
-  };
-
-  const handleRemovePriceRange = () => {
-    setPriceRange({ min: 0, max: 100000 });
-    setCurrentPage(0);
-  };
-
-  const handleRemoveRating = () => {
-    setMinRating(null);
-    setCurrentPage(0);
-  };
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  try {
+    const data = await fetchBooks({
+      page,
+      size,
+      sort,
+      minPrice,
+      maxPrice,
+      minRating,
+      category,
+      keyword,
+    });
+    initialBooks = data.content;
+    initialTotalPages = data.totalPages;
+  } catch (error) {
+    console.error('Failed to fetch initial books:', error);
+    // 에러가 발생해도 클라이언트 컴포넌트에서 다시 시도하므로 빈 배열 전달
+  }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
-      <div className="flex gap-6">
-        {/* Desktop Sidebar */}
-        <div className="hidden lg:block w-64 flex-shrink-0">
-          <FilterSidebar
-            priceRange={priceRange}
-            minRating={minRating}
-            onPriceRangeChange={handlePriceRangeChange}
-            onMinRatingChange={handleMinRatingChange}
-            onReset={handleResetFilters}
-          />
-        </div>
-
-        {showMobileFilter && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
-            <FilterSidebar
-              priceRange={priceRange}
-              minRating={minRating}
-              onPriceRangeChange={handlePriceRangeChange}
-              onMinRatingChange={handleMinRatingChange}
-              onReset={handleResetFilters}
-              isMobile
-              onClose={() => setShowMobileFilter(false)}
-            />
-          </div>
-        )}
-
-        <div className="flex-1 space-y-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold mb-2">도서 목록</h1>
-              <p className="text-warm-600">다양한 책을 만나보세요</p>
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setShowMobileFilter(true)}
-                className="lg:hidden flex items-center gap-2 px-4 py-2 border border-warm-300 rounded-xl hover:border-primary-500 transition-colors"
-              >
-                <Filter className="w-4 h-4" />
-                필터
-              </button>
-              <SortDropdown value={sortBy} onChange={handleSortChange} />
-            </div>
-          </div>
-
-          <BookSearchBar onSearch={handleSearch} placeholder="제목 또는 저자로 검색" />
-
-          <CategoryFilter
-            selectedCategory={selectedCategory}
-            onSelectCategory={handleCategoryChange}
-          />
-
-          <FilterTags
-            priceRange={priceRange}
-            minRating={minRating}
-            onRemovePriceRange={handleRemovePriceRange}
-            onRemoveRating={handleRemoveRating}
-          />
-
-          {error && (
-            <div className="bg-error-50 border border-error-200 text-error-600 px-4 py-3 rounded-xl flex items-center gap-2">
-              <span>⚠️</span>
-              {error}
-            </div>
-          )}
-
-          {searchKeyword && (
-            <div className="text-sm text-warm-600">
-              "{searchKeyword}" 검색 결과: {books.length}권
-            </div>
-          )}
-
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <BookCardSkeleton key={i} />
-              ))}
-            </div>
-          ) : books.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-warm-500 text-lg">도서가 없습니다</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {books.map((book) => (
-                <BookCard key={book.id} book={book} />
-              ))}
-            </div>
-          )}
-
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
-        </div>
-      </div>
-    </div>
+    <BookListClient
+      initialBooks={initialBooks}
+      initialTotalPages={initialTotalPages}
+    />
   );
+}
+
+/**
+ * 메타데이터 생성 (SEO)
+ */
+export async function generateMetadata({ searchParams }: BooksPageProps) {
+  const params = await searchParams;
+  const keyword = params.search as string;
+  const category = params.category as string;
+
+  let title = '도서 목록 | BookBean';
+  let description = 'BookBean에서 다양한 도서를 만나보세요.';
+
+  if (keyword) {
+    title = `"${keyword}" 검색 결과 | BookBean`;
+    description = `"${keyword}"에 대한 도서 검색 결과입니다.`;
+  } else if (category) {
+    title = `카테고리 도서 | BookBean`;
+    description = '선택한 카테고리의 도서 목록입니다.';
+  }
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+    },
+  };
 }

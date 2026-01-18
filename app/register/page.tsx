@@ -29,6 +29,9 @@ const registerSchema = z
     path: ['confirmPassword'],
   });
 
+
+type RegisterFormData = z.infer<typeof registerSchema>;
+
 export default function RegisterPage() {
   const router = useRouter();
   const { register: registerUser, loading } = useAuthStore();
@@ -41,7 +44,7 @@ export default function RegisterPage() {
     resolver: zodResolver(registerSchema),
   });
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: RegisterFormData) => {
     const success = await registerUser(data);
     if (success) {
       toast.success('회원가입 성공! 로그인해주세요.');

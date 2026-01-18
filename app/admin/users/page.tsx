@@ -75,7 +75,7 @@ const Pagination = ({
 
 export default function AdminUsersPage() {
   const { user: authUser } = useAuthStore();
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -103,8 +103,8 @@ export default function AdminUsersPage() {
       });
       setUsers(response.data?.content || []);
       setTotalPages(response.data?.totalPages || 0);
-    } catch (error: any) {
-      toast.error('사용자 목록을 불러올 수 없습니다');
+    } catch (error) {
+      $1('작업에 실패했습니다');
     } finally {
       setLoading(false);
     }
@@ -167,7 +167,7 @@ export default function AdminUsersPage() {
     }
   };
 
-  const renderUserBadges = (user: any) => (
+  const renderUserBadges = (user: User) => (
     <div className="flex items-center space-x-2">
       <span
         className={`px-2 py-1 text-xs rounded-full ${

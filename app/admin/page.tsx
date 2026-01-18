@@ -1,9 +1,67 @@
 import { Book, Package, Users, Tag } from 'lucide-react';
 import Link from 'next/link';
-import SalesChart from '@/components/dashboard/SalesChart';
-import OrderStatusChart from '@/components/dashboard/OrderStatusChart';
-import TopBooksChart from '@/components/dashboard/TopBooksChart';
-import NewUsersChart from '@/components/dashboard/NewUsersChart';
+import dynamic from 'next/dynamic';
+
+// 동적 임포트로 차트 컴포넌트 지연 로드
+const SalesChart = dynamic(
+  () => import('@/components/dashboard/SalesChart').then((mod) => mod.default),
+  {
+    loading: () => (
+      <div className="bg-white rounded-lg shadow-md p-6 h-80 flex items-center justify-center">
+        <div className="animate-pulse space-y-2 w-full">
+          <div className="h-6 bg-gray-200 rounded w-32 mb-4" />
+          <div className="h-64 bg-gray-100 rounded-lg" />
+        </div>
+      </div>
+    ),
+    ssr: false,
+  }
+);
+
+const OrderStatusChart = dynamic(
+  () => import('@/components/dashboard/OrderStatusChart').then((mod) => mod.default),
+  {
+    loading: () => (
+      <div className="bg-white rounded-lg shadow-md p-6 h-80 flex items-center justify-center">
+        <div className="animate-pulse space-y-2 w-full">
+          <div className="h-6 bg-gray-200 rounded w-32 mb-4" />
+          <div className="h-64 bg-gray-100 rounded-lg" />
+        </div>
+      </div>
+    ),
+    ssr: false,
+  }
+);
+
+const TopBooksChart = dynamic(
+  () => import('@/components/dashboard/TopBooksChart').then((mod) => mod.default),
+  {
+    loading: () => (
+      <div className="bg-white rounded-lg shadow-md p-6 h-80 flex items-center justify-center">
+        <div className="animate-pulse space-y-2 w-full">
+          <div className="h-6 bg-gray-200 rounded w-32 mb-4" />
+          <div className="h-64 bg-gray-100 rounded-lg" />
+        </div>
+      </div>
+    ),
+    ssr: false,
+  }
+);
+
+const NewUsersChart = dynamic(
+  () => import('@/components/dashboard/NewUsersChart').then((mod) => mod.default),
+  {
+    loading: () => (
+      <div className="bg-white rounded-lg shadow-md p-6 h-80 flex items-center justify-center">
+        <div className="animate-pulse space-y-2 w-full">
+          <div className="h-6 bg-gray-200 rounded w-32 mb-4" />
+          <div className="h-64 bg-gray-100 rounded-lg" />
+        </div>
+      </div>
+    ),
+    ssr: false,
+  }
+);
 
 const AdminDashboard = () => {
   const menuItems = [

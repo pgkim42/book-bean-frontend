@@ -7,3 +7,4 @@ export * from './api.types';
 export * from './review.types';
 export * from './user.types';
 export * from './wishlist.types';
+export * from './coupon.types';

@@ -5,6 +5,14 @@ export interface User {
   email: string;
   name: string;
   role: string;
+  phone?: string;
+  zipCode?: string;
+  address?: string;
+  addressDetail?: string;
+  isActive?: boolean;
+  emailVerified?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface LoginCredentials {

@@ -1,4 +1,5 @@
 import api from './api';
+import type { User } from '../types';
 
 const userService = {
   // 내 정보 조회
@@ -18,7 +19,7 @@ const userService = {
   },
 
   // 사용자 정보 수정
-  updateUser: async (id: number, data: any) => {
+  updateUser: async (id: number, data: Partial<Omit<User, 'id'>>) => {
     return await api.put(`/users/${id}`, data);
   },
 

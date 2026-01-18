@@ -4,6 +4,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import api from '../services/api';
 import type { WishlistItem, WishlistState } from '../types';
+import type { ApiResponse } from '../types';
 
 interface WishlistActions {
   fetchWishlist: () => Promise<void>;
@@ -28,13 +29,14 @@ const useWishlistStore = create<WishlistStore>()(
       fetchWishlist: async () => {
         set({ loading: true, error: null });
         try {
-          const response: any = await api.get('/wishlist/my');
+          const response = await api.get<ApiResponse<WishlistItem[]>>('/wishlist/my');
           set({
             wishlist: response.data || [],
             loading: false,
           });
-        } catch (error: any) {
-          set({ error: error.message, loading: false, wishlist: [] });
+        } catch (error) {
+          const message = error instanceof Error ? error.message : '위시리스트를 불러오는데 실패했습니다';
+          set({ error: message, loading: false, wishlist: [] });
         }
       },
 
@@ -43,8 +45,9 @@ const useWishlistStore = create<WishlistStore>()(
           await api.post('/wishlist/add', { bookId });
           await get().fetchWishlist();
           return true;
-        } catch (error: any) {
-          set({ error: error.message });
+        } catch (error) {
+          const message = error instanceof Error ? error.message : '오류가 발생했습니다';
+          set({ error: message });
           return false;
         }
       },
@@ -56,8 +59,9 @@ const useWishlistStore = create<WishlistStore>()(
             wishlist: state.wishlist.filter((item) => item.bookId !== bookId),
           }));
           return true;
-        } catch (error: any) {
-          set({ error: error.message });
+        } catch (error) {
+          const message = error instanceof Error ? error.message : '오류가 발생했습니다';
+          set({ error: message });
           return false;
         }
       },

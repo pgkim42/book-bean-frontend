@@ -1,3 +1,7 @@
+'use client';
+
+import { memo, useCallback } from 'react';
+
 interface SortOption {
   value: string;
   label: string;
@@ -17,11 +21,15 @@ const defaultOptions: SortOption[] = [
   { value: 'title,asc', label: '제목순' },
 ];
 
-export default function SortDropdown({ value, onChange, options = defaultOptions }: SortDropdownProps) {
+function SortDropdown({ value, onChange, options = defaultOptions }: SortDropdownProps) {
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    onChange(e.target.value);
+  }, [onChange]);
+
   return (
     <select
       value={value}
-      onChange={(e) => onChange(e.target.value)}
+      onChange={handleChange}
       className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
     >
       {options.map((option) => (
@@ -32,3 +40,5 @@ export default function SortDropdown({ value, onChange, options = defaultOptions
     </select>
   );
 }
+
+export default memo(SortDropdown);

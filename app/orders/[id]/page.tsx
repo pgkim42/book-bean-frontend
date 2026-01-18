@@ -8,6 +8,7 @@ import orderService from '@/lib/services/orderService';
 import reviewService from '@/lib/services/reviewService';
 import { formatPrice, formatDate } from '@/lib/utils/formatters';
 import { ORDER_STATUS, PAYMENT_STATUS, PAYMENT_METHOD } from '@/lib/utils/constants';
+import type { Order, Review, ReviewCreateRequest, Book } from '@/lib/types';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -16,12 +17,12 @@ interface PageProps {
 export default function OrderDetailPage({ params }: PageProps) {
   const router = useRouter();
   const { id } = use(params);
-  const [order, setOrder] = useState<any>(null);
+  const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState(false);
-  const [userReviews, setUserReviews] = useState<any[]>([]);
+  const [userReviews, setUserReviews] = useState<Review[]>([]);
   const [showReviewForm, setShowReviewForm] = useState(false);
-  const [selectedBook, setSelectedBook] = useState<any>(null);
+  const [selectedBook, setSelectedBook] = useState<{ id: number; title: string } | null>(null);
 
   useEffect(() => {
     fetchOrderDetail();
@@ -31,7 +32,7 @@ export default function OrderDetailPage({ params }: PageProps) {
   const fetchOrderDetail = async () => {
     setLoading(true);
     try {
-      const response: any = await orderService.getOrder(id);
+      const response = await orderService.getOrder(id);
       setOrder(response.data);
     } catch (error) {
       toast.error('주문 정보를 불러올 수 없습니다');
@@ -43,7 +44,7 @@ export default function OrderDetailPage({ params }: PageProps) {
 
   const fetchUserReviews = async () => {
     try {
-      const response: any = await reviewService.getMyReviews({ page: 0, size: 100 });
+      const response = await reviewService.getMyReviews({ page: 0, size: 100 });
       setUserReviews(response.data?.content || []);
     } catch (error) {
       console.error('리뷰 목록 조회 실패:', error);
@@ -55,15 +56,16 @@ export default function OrderDetailPage({ params }: PageProps) {
     setShowReviewForm(true);
   };
 
-  const handleReviewSubmit = async (data: any) => {
+  const handleReviewSubmit = async (data: ReviewCreateRequest) => {
     try {
       await reviewService.createReview(data);
       toast.success('리뷰가 작성되었습니다');
       setShowReviewForm(false);
       setSelectedBook(null);
       fetchUserReviews();
-    } catch (error: any) {
-      toast.error(error.message || '리뷰 작성에 실패했습니다');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '$1';
+      toast.error(message);
       throw error;
     }
   };
@@ -82,8 +84,9 @@ export default function OrderDetailPage({ params }: PageProps) {
         await orderService.cancelOrder(id, reason);
         toast.success('주문이 취소되었습니다');
         fetchOrderDetail();
-      } catch (error: any) {
-        toast.error(error.message || '주문 취소에 실패했습니다');
+      } catch (error) {
+        const message = error instanceof Error ? error.message : '주문 취소에 실패했습니다';
+        toast.error(message);
       } finally {
         setCancelling(false);
       }

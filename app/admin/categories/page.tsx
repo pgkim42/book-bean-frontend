@@ -256,8 +256,8 @@ export default function AdminCategoriesPage() {
         toast.success('카테고리가 등록되었습니다');
       }
       fetchCategories();
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.message || '카테고리 저장에 실패했습니다';
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : '$1';
       toast.error(errorMessage);
       throw error; // Keep modal open on error
     }

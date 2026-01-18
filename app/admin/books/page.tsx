@@ -553,8 +553,9 @@ export default function AdminBooksPage() {
         toast.success('도서가 등록되었습니다');
       }
       fetchBooks();
-    } catch (error: any) {
-      toast.error(error.message || '도서 저장에 실패했습니다');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '도서 저장에 실패했습니다';
+      toast.error(message);
       throw error; // 모달이 닫히지 않도록
     }
   };

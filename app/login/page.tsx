@@ -13,6 +13,11 @@ const loginSchema = z.object({
   password: z.string().min(1, '비밀번호를 입력해주세요'),
 });
 
+type LoginFormData = z.infer<typeof loginSchema>;
+  email: z.string().email('유효한 이메일을 입력해주세요'),
+  password: z.string().min(1, '비밀번호를 입력해주세요'),
+});
+
 export default function LoginPage() {
   const router = useRouter();
   const { login, loading } = useAuthStore();
@@ -25,7 +30,7 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: LoginFormData) => {
     const success = await login(data);
     if (success) {
       toast.success('로그인 성공!');

@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import type { Review } from '@/lib/types';
+import type { Review, ReviewCreateRequest, ReviewUpdateRequest } from '@/lib/types';
 
 interface ReviewFormProps {
   bookId: number;
-  onSubmit: (data: any) => Promise<void>;
+  onSubmit: (data: ReviewCreateRequest | ReviewUpdateRequest) => Promise<void>;
   onCancel: () => void;
   initialData?: Review;
 }

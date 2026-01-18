@@ -1,4 +1,6 @@
 // SSR-safe localStorage utility
+import type { User } from '../types';
+
 export const storage = {
   getToken: (): string | null => {
     if (typeof window === 'undefined') return null;
@@ -15,7 +17,7 @@ export const storage = {
     localStorage.removeItem('auth_token');
   },
 
-  getUser: (): any | null => {
+  getUser: (): User | null => {
     if (typeof window === 'undefined') return null;
     const userStr = localStorage.getItem('user_info');
     if (!userStr) return null;
@@ -26,7 +28,7 @@ export const storage = {
     }
   },
 
-  setUser: (user: any): void => {
+  setUser: (user: User): void => {
     if (typeof window === 'undefined') return;
     localStorage.setItem('user_info', JSON.stringify(user));
   },

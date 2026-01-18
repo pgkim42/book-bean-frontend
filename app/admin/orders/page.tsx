@@ -6,6 +6,7 @@ import { Check, Truck, Package, LayoutGrid, Table, List } from 'lucide-react';
 import orderService from '@/lib/services/orderService';
 import { formatPrice, formatDate } from '@/lib/utils/formatters';
 import { ORDER_STATUS, PAYMENT_STATUS } from '@/lib/utils/constants';
+import type { Order } from '@/lib/types';
 
 const VIEW_MODES = {
   CARD: 'card',
@@ -14,7 +15,7 @@ const VIEW_MODES = {
 };
 
 export default function AdminOrdersPage() {
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -34,7 +35,7 @@ export default function AdminOrdersPage() {
     setLoading(true);
     try {
       // 관리자용 전체 주문 조회 API 사용
-      const response: any = await orderService.getAllOrders({
+      const response = await orderService.getAllOrders({
         page: currentPage,
         size: pageSize,
         sort: 'createdAt,desc',
@@ -55,8 +56,9 @@ export default function AdminOrdersPage() {
         await orderService.confirmPayment(orderId);
         alert('결제가 확인되었습니다');
         fetchOrders();
-      } catch (error: any) {
-        alert(error.message || '결제 확인에 실패했습니다');
+      } catch (error) {
+        const message = error instanceof Error ? error.message : '$1';
+        alert(message);
       }
     }
   };
@@ -80,8 +82,9 @@ export default function AdminOrdersPage() {
         await orderService.completeDelivery(orderId);
         alert('배송이 완료되었습니다');
         fetchOrders();
-      } catch (error: any) {
-        alert(error.message || '배송 완료 처리에 실패했습니다');
+      } catch (error) {
+        const message = error instanceof Error ? error.message : '$1';
+        alert(message);
       }
     }
   };
@@ -93,7 +96,7 @@ export default function AdminOrdersPage() {
     }
   };
 
-  const renderOrderActions = (order: any) => (
+  const renderOrderActions = (order: Order) => (
     <div className="flex space-x-2">
       {order.orderStatus === 'PENDING' && order.paymentStatus === 'PENDING' && (
         <button

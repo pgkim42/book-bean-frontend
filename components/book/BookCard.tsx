@@ -1,16 +1,18 @@
 'use client';
 
+import { memo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { formatPrice } from '@/lib/utils/formatters';
 import { BOOK_STATUS } from '@/lib/utils/constants';
+import { getBookImageBlurPlaceholder } from '@/lib/utils/image';
 import type { Book } from '@/lib/types';
 
 interface BookCardProps {
   book: Book;
 }
 
-export default function BookCard({ book }: BookCardProps) {
+function BookCard({ book }: BookCardProps) {
   return (
     <Link
       href={`/books/${book.id}`}
@@ -24,6 +26,8 @@ export default function BookCard({ book }: BookCardProps) {
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            placeholder="blur"
+            blurDataURL={getBookImageBlurPlaceholder()}
           />
         ) : (
           <div className="w-full h-full bg-warm-100 flex items-center justify-center">
@@ -52,3 +56,4 @@ export default function BookCard({ book }: BookCardProps) {
   );
 }
 
+export default memo(BookCard);

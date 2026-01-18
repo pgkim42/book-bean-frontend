@@ -3,6 +3,7 @@
 import { create } from 'zustand';
 import api from '../services/api';
 import type { CartItem, CartSummary, CartItemAddRequest } from '../types';
+import type { ApiResponse } from '../types';
 
 interface CartState {
   cartSummary: CartSummary | null;
@@ -34,16 +35,17 @@ const useCartStore = create<CartStore>()((set, get) => ({
     set({ loading: true, error: null });
     try {
       // 백엔드: GET /api/v1/carts → CartSummaryDto 반환
-      const response: any = await api.get('/carts');
+      const response = await api.get<ApiResponse<CartSummary>>('/carts');
       // api.ts 인터셉터가 response.data를 반환하므로, response가 곧 ApiResponse
-      const cartData = response.data || response;
+      const cartData = response.data || (response as unknown as CartSummary);
       set({
         cartSummary: cartData,
         items: cartData?.items || [],
         loading: false,
       });
-    } catch (error: any) {
-      set({ error: error.message, loading: false, items: [] });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '장바구니를 불러오는데 실패했습니다';
+      set({ error: message, loading: false, items: [] });
     }
   },
 
@@ -53,8 +55,9 @@ const useCartStore = create<CartStore>()((set, get) => ({
       await api.post('/carts/items', data);
       await get().fetchCart();
       return true;
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '오류가 발생했습니다';
+      set({ error: message });
       return false;
     }
   },
@@ -65,8 +68,9 @@ const useCartStore = create<CartStore>()((set, get) => ({
       await api.put(`/carts/items/${itemId}?quantity=${quantity}`);
       await get().fetchCart();
       return true;
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '오류가 발생했습니다';
+      set({ error: message });
       return false;
     }
   },
@@ -77,8 +81,9 @@ const useCartStore = create<CartStore>()((set, get) => ({
       await api.delete(`/carts/items/${itemId}`);
       await get().fetchCart();
       return true;
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '오류가 발생했습니다';
+      set({ error: message });
       return false;
     }
   },
@@ -89,8 +94,9 @@ const useCartStore = create<CartStore>()((set, get) => ({
       await api.delete('/carts/items');
       set({ cartSummary: null, items: [] });
       return true;
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '오류가 발생했습니다';
+      set({ error: message });
       return false;
     }
   },

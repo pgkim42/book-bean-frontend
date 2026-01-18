@@ -12,6 +12,9 @@ import orderService from '@/lib/services/orderService';
 import couponService from '@/lib/services/couponService';
 import { formatPrice } from '@/lib/utils/formatters';
 import { PAYMENT_METHOD } from '@/lib/utils/constants';
+import type { Coupon, CartItem, OrderCreateRequest } from '@/lib/types';
+
+type CheckoutFormData = z.infer<typeof checkoutSchema>;
 
 const checkoutSchema = z.object({
   recipientName: z.string().min(1, '받는 사람 이름을 입력해주세요').max(50),
@@ -29,7 +32,7 @@ export default function CheckoutPage() {
   const { items, cartSummary } = useCartStore();
   const [loading, setLoading] = useState(false);
 
-  const [coupons, setCoupons] = useState<any[]>([]);
+  const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [selectedCouponId, setSelectedCouponId] = useState<string | null>(null);
   const [couponDiscount, setCouponDiscount] = useState(0);
   const [discountDescription, setDiscountDescription] = useState('');
@@ -61,7 +64,7 @@ export default function CheckoutPage() {
   useEffect(() => {
     const loadCoupons = async () => {
       try {
-        const response: any = await couponService.getMyAvailableCoupons();
+        const response = await couponService.getMyAvailableCoupons();
         setCoupons(response.data || []);
       } catch (error) {
         console.error('쿠폰 로드 실패:', error);
@@ -84,7 +87,7 @@ export default function CheckoutPage() {
       const totalBookPrice = cartSummary?.totalPrice || 0;
       const deliveryFee = totalBookPrice >= 30000 ? 0 : 3000;
 
-      const response: any = await couponService.calculateDiscount(
+      const response = await couponService.calculateDiscount(
         couponId,
         totalBookPrice,
         deliveryFee
@@ -99,17 +102,17 @@ export default function CheckoutPage() {
     }
   };
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: CheckoutFormData) => {
     setLoading(true);
     try {
-      const selectedItems = items.filter((item: any) => item.selected !== false);
+      const selectedItems = items.filter((item: CartItem) => item.selected !== false);
 
       if (selectedItems.length === 0) {
         toast.error('주문할 상품을 선택해주세요');
         return;
       }
 
-      const orderItems = selectedItems.map((item: any) => ({
+      const orderItems = selectedItems.map((item: CartItem) => ({
         bookId: item.bookId,
         quantity: item.quantity,
       }));
@@ -120,11 +123,12 @@ export default function CheckoutPage() {
         userCouponId: selectedCouponId ? Number(selectedCouponId) : null,
       };
 
-      const response: any = await orderService.createOrder(orderData);
+      const response = await orderService.createOrder(orderData);
       toast.success('주문이 완료되었습니다!');
       router.push(`/orders/${response.data.id}`);
-    } catch (error: any) {
-      toast.error(error.message || '주문에 실패했습니다');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '주문에 실패했습니다';
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -134,7 +138,7 @@ export default function CheckoutPage() {
     return null;
   }
 
-  const selectedItems = items.filter((item: any) => item.selected !== false);
+  const selectedItems = items.filter((item: CartItem) => item.selected !== false);
   const totalBookPrice = cartSummary?.totalPrice || 0;
   const FREE_SHIPPING_THRESHOLD = 30000;
   const deliveryFee = totalBookPrice >= FREE_SHIPPING_THRESHOLD ? 0 : 3000;
@@ -275,7 +279,7 @@ export default function CheckoutPage() {
             <div className="bg-white rounded-lg shadow-md p-6">
               <h2 className="text-xl font-bold mb-4">주문 상품</h2>
               <div className="space-y-2">
-                {selectedItems.map((item: any) => (
+                {selectedItems.map((item: CartItem) => (
                   <div key={item.id} className="flex items-center gap-4 py-2 border-b last:border-b-0">
                     {item.bookCoverImageUrl ? (
                       <img

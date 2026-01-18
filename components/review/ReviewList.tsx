@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { Review } from '@/lib/types';
+import type { Review, PaginatedResponse } from '@/lib/types';
 import reviewService from '@/lib/services/reviewService';
 
 interface ReviewListProps {
@@ -17,7 +17,7 @@ export default function ReviewList({ bookId, refreshTrigger }: ReviewListProps) 
 
   const fetchReviews = async () => {
     try {
-      const response: any = await reviewService.getBookReviews(bookId);
+      const response = await reviewService.getBookReviews(bookId);
       setReviews(response.data?.content || []);
     } catch (error) {
       console.error('Failed to fetch reviews:', error);

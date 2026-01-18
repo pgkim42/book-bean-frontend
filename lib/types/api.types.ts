@@ -16,7 +16,20 @@ export interface ApiResponse<T> {
 export interface ApiError {
   status: number;
   message: string;
-  data?: any;
+  data?: unknown;
+}
+
+export type ApiErrorLike = ApiError | Error | { response?: { data?: ApiError }; message?: string };
+
+export interface ApiErrorResponse {
+  success: false;
+  code: string;
+  message: string;
+  errors?: Array<{
+    field: string;
+    value: string;
+    reason: string;
+  }>;
 }
 
 export interface PaginatedResponse<T> {

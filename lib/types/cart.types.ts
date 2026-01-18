@@ -8,6 +8,13 @@ export interface CartItem {
   price: number;
   quantity: number;
   imageUrl?: string;
+  // Aliases for API responses that use different field names
+  bookTitle?: string;
+  bookAuthor?: string;
+  bookCoverImageUrl?: string;
+  bookCurrentPrice?: number;
+  totalPrice?: number;
+  selected?: boolean;
 }
 
 export interface CartSummary {

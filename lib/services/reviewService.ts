@@ -1,5 +1,5 @@
 import api from './api';
-import type { Review, ReviewCreateRequest, ReviewUpdateRequest } from '../types';
+import type { Review, ReviewCreateRequest, ReviewUpdateRequest, PaginatedResponse } from '../types';
 
 const reviewService = {
   // 리뷰 작성
@@ -13,7 +13,7 @@ const reviewService = {
   },
 
   // 특정 도서의 리뷰 목록
-  getBookReviews: async (bookId: number, params: { page?: number; size?: number; sort?: string } = {}): Promise<any> => {
+  getBookReviews: async (bookId: number, params: { page?: number; size?: number; sort?: string } = {}): Promise<PaginatedResponse<Review>> => {
     const { page = 0, size = 10, sort = 'createdAt,desc' } = params;
     return await api.get(`/reviews/books/${bookId}`, {
       params: { page, size, sort },
@@ -21,7 +21,7 @@ const reviewService = {
   },
 
   // 내 리뷰 목록
-  getMyReviews: async (params: { page?: number; size?: number; sort?: string } = {}): Promise<any> => {
+  getMyReviews: async (params: { page?: number; size?: number; sort?: string } = {}): Promise<PaginatedResponse<Review>> => {
     const { page = 0, size = 10, sort = 'createdAt,desc' } = params;
     return await api.get('/reviews/my', { params: { page, size, sort } });
   },
